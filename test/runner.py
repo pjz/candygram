@@ -17,7 +17,14 @@ def loadCandygram(pwd):
 	# modules before we are able to redefine the candygram package. We therefore
 	# need to remove these modules, redefine src as candygram, and then reload
 	# src.
-	import src
+	try:
+		import src
+	except ImportError:
+		# 'import src' will fail if src/__init__.py cannot find the 'candygram'
+		# package installed anywhere, which will be the case if candygram hasn't
+		# been installed yet. Even though the import fails, sys.modules will still
+		# have an entry for 'src'. We use that entry to define `src' here.
+		src = sys.modules['src']
 	for module in sys.modules.keys():
 		if module.startswith('candygram'):
 			del sys.modules[module]
