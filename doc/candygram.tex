@@ -44,9 +44,9 @@ Free Documentation License''.
 Candygram is a Python implementation of \Erlang\ concurrency primitives. Erlang
 is widely respected for its elegant built-in facilities for concurrent
 programming. This package attempts to emulate those facilities as closely as
-possible in Python. Specifically, this package provides functions that allow
-developers to send and receive messages between threads using semantics nearly
-identical to those in the Erlang language.
+possible in Python. With Candygram, developers can send and receive messages
+between threads using semantics nearly identical to those in the Erlang
+language.
 \end{abstract}
 
 \tableofcontents
@@ -56,10 +56,11 @@ identical to those in the Erlang language.
 % ############################################################################
 \section{Download And Install}
 
-All available versions of Candygram can be \ulink{downloaded here}
-	{http://sourceforge.net/project/showfiles.php?group_id=114295} on
-SourceForge.net. The current stable release, as of this writing, is \version.
-This documentation can also be downloaded in PDF format from the link above.
+You can download all available versions of Candygram from
+\ulink{SourceForge.net}
+	{http://sourceforge.net/project/showfiles.php?group_id=114295}. The current
+stable release, as of this writing, is \version. You can also download this
+document in PDF format from the link above.
 
 To install, uncompress the zip or tar file, \program{cd} into the directory, and
 run:
@@ -82,10 +83,9 @@ because Erlang is a functional language, no state is shared among its threads.
 Since the concurrent tasks in an Erlang system run as peers within a single
 [virtual] machine and don't share state, they are therefore named ``Processes''.
 
-In order to avoid confusion when using this documentation alongside the Erlang
-documentation, the word ``process'' is used instead of ``thread'' throughout the
-remainder of this document. You are free to pronounce the word ``process''
-however you wish.
+To avoid confusion when using this document alongside the Erlang documentation,
+the remainder of this document uses the word ``process'' instead of ``thread''.
+You are free, however, to pronounce the word ``process'' however you wish.
 \end{notice}
 
 This package provides an implementation of the following \Erlang\ core
@@ -99,20 +99,20 @@ functions:
 
 These 4 functions form the core of Erlang's concurrency services. The
 \function{spawn()} function creates a new process, the \function{send()}
-function will send a message to another process, the \keyword{receive} statement
+function sends a message to another process, the \keyword{receive} statement
 specifies what to do with received messages, and the \function{link()} function
 allows one process to monitor the status of another process. In addition to
 these core functions, this package also provides implementations of several
 supplemental functions such as \function{spawn_link()} and \function{exit()}.
 
-The beauty of the Erlang system is that it is simple and yet powerful.
-To communicate with another process, you simply send a message to it.
-You need not worry about locks, semaphores, mutexes, etc., in order to
-share information among concurrent tasks. Even though message passing is
-typically used to implement the producer/consumer model, when it is combined
-with the flexibility of the \keyword{receive} statement, it becomes much more
-powerful. For example, when using timeouts and selective receives, a process
-may easily handle its messages as a state machine, or as a priority queue.
+The beauty of the Erlang system is that it is simple and yet powerful. To
+communicate with another process, you simply send a message to it. You do not
+need not worry about locks, semaphores, mutexes, etc. to share information among
+concurrent tasks. Developers mostly use message passing only to implement the
+producer/consumer model. When you combine message passing with the flexibility
+of the \keyword{receive} statement, however, it becomes much more powerful. For
+example, by using timeouts and receive patterns, a process may easily handle its
+messages as a state machine, or as a priority queue.
 
 For those who wish to become more familiar with Erlang, \erlangbook\ provides a
 very complete introduction. In particular, this package implements all of the
@@ -127,39 +127,40 @@ functions described in chapter 5 and sections 7.2, 7.3, and 7.5 of that book.
 
 \newcommand{\addhandler}{\method{addHandler()}}
 
-Erlang provides pattern matching in its very syntax, which is then used by the
-\keyword{receive} statement. Since Python does not provide pattern matching in
-its syntax, we must use a slightly different mechanism to match messages. The
+Erlang provides pattern matching in its very syntax, which the \keyword{receive}
+statement uses to its advantage. Since Python does not provide pattern matching
+in its syntax, we must use a slightly different mechanism to match messages. The
 first parameter passed to the \method{Receiver.addHandler()} method
 [\ref{Receiver}] can be any Python value. The \addhandler\ method uses this
 value as a pattern and interprets it in the following way:
 \begin{enumerate}
 	\item If the value is \constant{candygram.Any}, then any message will match.
-	\item If the value is a class or a type object, then any message that
-		\function{isinstance()} of the class or type will match.
-	\item If the value is a function or method, then a message will match if the
+	\item If the value is a type object or a class, then any message that
+		\function{isinstance()} of the type or class will match.
+	\item If the value is \function{callable()}, then a message will match if the
 		function/method returns \constant{True} when called with the message.
 	\item If the value is a list or tuple, then a message will match only if it
 		is a list or tuple, respectively, and of the same length. Also, each value
-		in the sequence is then used as a pattern and the sequence as a whole will
-		match only if every pattern in the sequence matches.
+		in the sequence is used as a pattern and the sequence as a whole will
+		match only if every pattern in the sequence matches its associated value in
+		the message.
 	\item If the value is a list or tuple, and the last item in the sequence is
 		\constant{candygram.AnyRemaining}, then the above rule applies except that
 		the message sequence may be any length that is \greaterthan= len(pattern)-1.
 	\item If the value is a dictionary, then a message will match only if it
 		is a dictionary that contains all of the same keys as the pattern value.
-		Also, each value in the dictionary is then used as a pattern and the
+		Also, each value in the dictionary is used as a pattern and the
 		dictionary as a whole will match only if every pattern in the dictionary
 		matches its associated value in the message.
-	\item Lastly, any other value is treated as a literal pattern. That is, a
-		message will match if it is equal to the given value.
+	\item Lastly, \addhandler\ treats any other value as a literal pattern. That
+		is, a message will match if it is equal to the given value.
 \end{enumerate}
 
 \subsection{Examples}
-These rules are best illustrated by example. In the table below, the first
-column contains a Python value that is used as a pattern. The second column
-contains Python values that would match the pattern and the third column
-contains Python values that would not match the pattern.
+Let's illustrate these rules by example. In the table below, the first column
+contains a Python value that is used as a pattern. The second column contains
+Python values that match the pattern and the third column contains Python values
+that do not match the pattern.
 \begin{tableiii}{l|l|l}{textrm}{Pattern}{Matches}{Non-Matches}
 \lineiii{Any}
 	{'shark', 13.7, (1, '', lambda: true)}
@@ -175,13 +176,13 @@ contains Python values that would not match the pattern.
 	{'shark', 13.7, []}
 \lineiii{str}
 	{'shark', '', 'dolphin'}
-	{42, 0.9, lambda: true}
+	{42, 0.9, lambda: True}
 \lineiii{lambda x: x \greaterthan\ 20}
 	{42, 100, 67.7}
 	{13, 0, -67.7}
 \lineiii{(str, int)}
 	{('shark', 42), ('dolphin', 0)}
-	{['shark', 42], ('dolphin', 42, 0.9)}
+	{['shark', 42], ('dolphin', 42, 0)}
 \lineiii{(str, int, AnyRemaining)}
 	{('dolphin', 0), ('dolphin', 42, 0.9)}
 	{('dolphin',), (42, 'dolphin')}
@@ -201,9 +202,9 @@ contains Python values that would not match the pattern.
 \declaremodule{extension}{candygram}
 \modulesynopsis{Erlang concurrency primitives}
 
-The following functions, classes, constants, and exceptions are exported by the
-\module{candygram} module. Since the name \module{candygram} is a bit long, the
-module is typically imported in one of the following ways:
+The \module{candygram} module exports the following functions, classes,
+constants, and exceptions. Since the name \module{candygram} is a bit long, you
+would typically import the module in one of the following ways:
 \begin{verbatim}
 >>> from candygram import *
 \end{verbatim}
@@ -218,26 +219,26 @@ or
 \subsection{Functions}
 
 \begin{funcdesc}{spawn}{func\optional{, args\moreargs}}
-Return the \class{Process} instance of a new concurrent process started by
-calling the function \var{func} with the \var{args} argument list. When the
-function returns, the process terminates. A \code{'badarg'}
-\exception{ExitError} is raised if \var{func} is not \function{callable()}.
+Create a new concurrent process by calling the function \var{func} with the
+\var{args} argument list and return the resulting \class{Process} instance.
+When the function returns, the process terminates. Raises a \code{'badarg'}
+\exception{ExitError} if \var{func} is not \function{callable()}.
 \end{funcdesc}
 
 \begin{funcdesc}{link}{proc}
 Create a link to the process \var{proc}, if there is not such a link already. If
-a process attempts to create a link to itself, nothing is done. A
-\code{'badarg'} \exception{ExitError} is raised if \var{proc} is not a
-\class{Process} instance. A \code{'noproc'} \code{'EXIT'} signal is sent to
-calling process if the \var{proc} process is no longer alive.
+a process attempts to create a link to itself, nothing is done. Raises a
+\code{'badarg'} \exception{ExitError} if \var{proc} is not a \class{Process}
+instance. Sends a \code{'noproc'} \code{'EXIT'} signal to calling process if the
+\var{proc} process is no longer alive.
 
-When a process terminates, an \code{'EXIT'} signal is sent to all of its linked
-processes. If a process terminates normally, a \code{'normal'} \code{'EXIT'}
-signal is sent to its linked processes.
+When a process terminates, it sends an \code{'EXIT'} signal is to all of its
+linked processes. If a process terminates normally, it sends a \code{'normal'}
+\code{'EXIT'} signal to its linked processes.
 
 All links are bidirectional. That is, if process A calls \code{link(B)}, then if
-process B terminates, an \code{'EXIT'} signal is sent to process A. Conversely,
-if process A terminates, an \code{'EXIT'} signal is likewise sent to process B.
+process B terminates, it sends an \code{'EXIT'} signal to process A. Conversely,
+if process A terminates, it likewise sends an \code{'EXIT'} signal to process B.
 
 Refer to the \function{processFlag()} function for details about handling
 signals.
@@ -252,22 +253,22 @@ operation:
 \end{verbatim}
 This function is necessary since the process created might run immediately and
 fail before \function{link()} is called. Returns the \class{Process} instance of
-the newly created process. A \code{'badarg'} \exception{ExitError} is raised if
+the newly created process. Raises a \code{'badarg'} \exception{ExitError} if
 \var{func} is not \function{callable()}.
 \end{funcdesc}
 
 \begin{funcdesc}{unlink}{proc}
 Remove the link, if there is one, from the calling process to another process
-given by the \var{proc} argument. The function will not fail if the calling
-process is not linked to \var{proc}, or if \var{proc} is not alive. A
-\code{'badarg'} \exception{ExitError} is raised if \var{proc} is not a
-\class{Process} instance.
+given by the \var{proc} argument. The function does not fail if the calling
+process is not linked to \var{proc}, or if \var{proc} is not alive. Raises a
+\code{'badarg'} \exception{ExitError} if \var{proc} is not a \class{Process}
+instance.
 \end{funcdesc}
 
 \begin{funcdesc}{isProcessAlive}{proc}
 Return \constant{True} if the process is alive, i.e., has not terminated.
-Otherwise, return \constant{False}. A \code{'badarg'} \exception{ExitError} is
-raised if \var{proc} is not a \class{Process} instance.
+Otherwise, return \constant{False}. Raises a \code{'badarg'}
+\exception{ExitError} if \var{proc} is not a \class{Process} instance.
 \end{funcdesc}
 
 \begin{funcdesc}{self}{}
@@ -275,8 +276,8 @@ Return the \class{Process} instance of the calling process.
 \end{funcdesc}
 
 \begin{funcdesc}{self_}{}
-An alias for the \function{self()} function. This function can be used used in
-class methods where \var{self} is already defined.
+An alias for the \function{self()} function. You can use this function in class
+methods where \var{self} is already defined.
 \end{funcdesc}
 
 \begin{funcdesc}{processes}{}
@@ -285,8 +286,9 @@ Return a list of all active processes.
 
 \begin{funcdesc}{send}{proc, message}
 Send the \var{message} to the \var{proc} process and return \var{message}. This
-is the same as \var{proc}\code{.send(}\var{message}\code{)}. A \code{'badarg'}
-\exception{ExitError} is raised if \var{proc} is not a \class{Process} instance.
+is the same as \var{proc}\code{.send(}\var{message}\code{)}. Raises a
+\code{'badarg'} \exception{ExitError} if \var{proc} is not a \class{Process}
+instance.
 \end{funcdesc}
 
 \begin{funcdesc}{exit}{\optional{proc, }reason}
@@ -297,30 +299,30 @@ value.
 When the \var{proc} argument is given, this function sends an \code{'EXIT'}
 signal to the process \var{proc}. This is not necessarily the same as sending an
 \code{'EXIT'} message to \var{proc}. They are the same if \var{proc} is trapping
-exits. However, if \var{proc} is not trapping exits, the \var{proc} process will
-exit and propagate the \code{'EXIT'} signal in turn to its linked processes.
+exits. If \var{proc} is not trapping exits, however, the \var{proc} process
+terminates and propagates the \code{'EXIT'} signal in turn to its linked
+processes.
 
 If the \var{reason} is the string \code{'kill'}, for example
-\code{exit(proc, 'kill')}, an untrappable \code{'EXIT'} signal will be sent to
-the process. In other words, the \var{proc} process will be unconditionally
-killed.
+\code{exit(proc, 'kill')}, an untrappable \code{'EXIT'} signal is sent to the
+process. In other words, the \var{proc} process is unconditionally killed.
 
 Refer to the \function{processFlag()} function for details about trapping exits.
 \end{funcdesc}
 
 \begin{funcdesc}{processFlag}{flag, option}
-Set the given \var{flag} for the process which calls this function.
-Returns the old value of the flag. A \code{'badarg'} \exception{ExitError} is
-raised if \var{flag} is not a recognized flag value, or if \var{option} is not
-a recognized value for \var{flag}.
+Set the given \var{flag} for the calling process. Returns the old value of the
+flag. Raises a \code{'badarg'} \exception{ExitError} if \var{flag} is not a
+recognized flag value, or if \var{option} is not a recognized value for
+\var{flag}.
 
-Currently, the only recognized flag value is \code{'trap_exit'}. When
+Currently, \code{'trap_exit'} is the only recognized flag value. When
 \code{'trap_exit'} is set to \constant{True}, \code{'EXIT'} signals arriving to
 a process are converted to \code{('EXIT', from, reason)} messages, which can be
 received as ordinary messages. If \code{'trap_exit'} is set to \constant{False},
 the process exits if it receives an \code{'EXIT'} signal other than
-\code{'normal'} and the \code{'EXIT'} signal is propagated to its linked
-processes. Application processes should normally not trap exits.
+\code{'normal'} and propagates the \code{'EXIT'} signal to its linked processes.
+Application processes should normally not trap exits.
 \end{funcdesc}
 
 
@@ -330,8 +332,8 @@ processes. Application processes should normally not trap exits.
 
 \begin{classdesc}{Process}{}
 Represents a concurrent process. A \class{Process} is never created via its
-constructor. All processes are created via the \function{spawn()} and
-\function{spawnLink()} functions instead.
+constructor. The \function{spawn()} and \function{spawnLink()} functions create
+all processes.
 
 \begin{methoddesc}{isProcessAlive}{}
 Return \constant{True} if the process is alive, i.e., has not terminated.
@@ -340,26 +342,27 @@ Otherwise, return \constant{False}.
 
 \begin{methoddesc}{isAlive}{}
 An alias for the \method{isProcessAlive()} method. (The word ``process'' is
-redundant in a method name in the \class{Process} class.)
+redundant in a method name when the method is a member of the \class{Process}
+class.)
 \end{methoddesc}
 
 \begin{methoddesc}{send}{message}
-Send the \var{message} to this process and return \var{message}. Typically, a
-routine running in a separate process calls this method to place the given
-\var{message} into this process's mailbox. The message may then be picked up
-by a \class{Receiver} that is operating in this process.
+Send the \var{message} to this process and return \var{message}. A routine
+running in a separate process calls this method to place the given
+\var{message} into this process's mailbox. A \class{Receiver} that is operating
+in this process may then pick up the message.
 
-Sending a message is an asynchronous operation so the \method{send()} call will
-not wait for the message to be received by a \class{Receiver}. Even if this
-process has already terminated, the system will not notify the sender. Messages
-are always delivered, and always in the same order they were sent.
+Sending a message is an asynchronous operation so the \method{send()} call does
+not wait for a \class{Receiver} to retrieve the message. Even if this process
+has already terminated, the system does not notify the sender. Messages are
+always delivered, and always in the same order they were sent.
 \end{methoddesc}
 
 \begin{methoddesc}{__or__}{message}
 \opindex{|}
 An alias for the \method{send()} method. The OR operator, `\pipe', is aliased to
-the \method{send()} method so that messages can be sent using a more Erlangy
-syntax. In Erlang, messages are sent using the `!' primitive. For example:
+the \method{send()} method so that developers can use a more Erlangy syntax to
+send messages. In Erlang, the `!' primitive sends messages. For example:
 \begin{verbatim}
 >>> proc | ('knock-knock', 'candygram')
 \end{verbatim}
@@ -378,44 +381,47 @@ Retrieves messages from a process's mailbox. Every process maintains a mailbox,
 which contains messages that have been sent to it via the \method{send()}
 method. To retrieve the messages out of the mailbox, a process must use a
 \class{Receiver} object. Like the \keyword{receive} statement in Erlang, a
-\class{Receiver} object will match an incoming message against multiple patterns
-[\ref{patterns}] and will then invoke the callback function that is associated
-with the matching pattern.
+\class{Receiver} object compares an incoming message against multiple patterns
+[\ref{patterns}] and invokes the callback function that is associated
+with the first matching pattern.
 
-A single \class{Receiver} instance may not be used across multiple processes.
-The \class{Receiver} will raise an \exception{AssertionError} if one of its
-methods is invoked from a process other than the one that created it. Care
-should be taken, therefore, to make sure that a \class{Receiver} is created
-within the process that will be using it.
+\begin{notice}[warning]
+You may not use a single \class{Receiver} instance across multiple processes.
+The \class{Receiver} raises an \exception{AssertionError} if you call one
+of its methods from a process other than the one that created it. You should
+take care, therefore, to create a \class{Receiver} within the process that will
+be using it.
+\end{notice}
 
 \begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, args\moreargs}}}
-Register a handler function \var{func} to be called with the \var{args} argument
-list when a message matching \var{pattern} is received. When a handler function
-\var{func} is not specified, the \method{receive()} method will remove any
-matching messages from the mailbox and do nothing more with them. Refer to
+Register a handler function \var{func} for the \var{pattern}. The
+\method{receive()} method calls the \var{func} with the \var{args} argument
+list when it receives a message that matches \var{pattern}. When a handler
+function \var{func} is not specified, the \method{receive()} method removes any
+matching message from the mailbox and does nothing more with it. Refer to
 section \ref{patterns} for details about how to specify message patterns. Raises
-an \exception{AssertionError} if \var{func} is not \function{callable()}.
+a \code{'badarg'} \exception{ExitError} if \var{func} is not
+\function{callable()}.
 
-If any of the \var{args} parameters is \constant{candygram.Message}, then when
-\var{func} is invoked, that parameter is replaced with the message that matched
-the pattern.
+If any of the \var{args} parameters is \constant{candygram.Message}, then the
+\method{receive()} method replaces that parameter with the matching message when
+it invokes \var{func}.
 
-\note{The handler functions are not invoked until the \method{receive()}
-method is called. Refer to the \method{receive()} documentation for details
-about the mechanism by which handlers are invoked.}
+Refer to the \method{receive()} documentation for details about the
+mechanism by which it invokes the handlers.
 \end{methoddesc}
 
 \begin{methoddesc}{__setitem__}{pattern, funcWithArgs}
 \opindex{[]}
 An alias for the \method{addHandler()} method. If \var{funcWithArgs} is a tuple,
-then the first element in the tuple is sent as the \var{func} parameter to
-\method{addHandler()} and the remaining elements are sent as the \var{args}. If
-\var{funcWithArgs} is not a tuple, then it is assumed to be a handler function
-and sent as the \var{func} parameter to \method{addHandler()}.
+then this method sends the first element in the tuple as the \var{func}
+parameter to \method{addHandler()} and the remaining as the \var{args}. If
+\var{funcWithArgs} is not a tuple, then this method assumes it to be a handler
+function and sends it as the \var{func} parameter to \method{addHandler()}.
 
-\method{__setitem__()} is aliased to the \method{addHandler()} method so that
-handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
-are specified using ``\var{pattern} -\greaterthan\ \var{func}'' syntax. For
+\method{__setitem__()} is an alias to the \method{addHandler()} method so that
+developers can use a more Erlangy syntax to specify handlers. In Erlang, the
+``\var{pattern} -\greaterthan\ \var{func}'' syntax specifies pattern guards. For
 example:
 \begin{verbatim}
 >>> r = Receiver()
@@ -425,12 +431,12 @@ example:
 
 \begin{methoddesc}{__getitem__}{pattern}
 \opindex{[]}
-An alias for the \method{addHandler()} method. Using \method{__getitem__()} is
-equivalent to calling \method{addHandler()} without a \var{func} parameter.
+An alias for the \method{addHandler()} method. This method calls
+\method{addHandler()} without a \var{func} parameter.
 
-\method{__getitem__()} is aliased to the \method{addHandler()} method so that
-handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
-are specified using ``\var{pattern} -\greaterthan\ \var{func}'' syntax. For
+\method{__getitem__()} is an alias to the \method{addHandler()} method so that
+developers can use a more Erlangy syntax to specify handlers. In Erlang, the
+``\var{pattern} -\greaterthan\ \var{func}'' syntax specifies pattern guards. For
 example:
 \begin{verbatim}
 >>> r = Receiver()
@@ -440,23 +446,25 @@ example:
 
 \begin{methoddesc}{addHandlers}{receiver}
 Register all handler functions in \var{receiver} with this \class{Receiver}
-object. All patterns and handler functions that have been added to the given
-\var{receiver} will be added to this receiver, in the same order. You can use
-this method to make copies of \class{Receiver} objects. It is admissible to
-use a \var{receiver} that was created in a different process.
+object. This method adds all of the patterns and handler functions that have
+been added to the given \var{receiver} to this receiver, in the same order. You
+can use this method to make copies of \class{Receiver} objects. You may use a
+\var{receiver} that was created in a different process. Raises a \code{'badarg'}
+\exception{ExitError} if \var{receiver} is not a \class{Receiver} instance.
 \end{methoddesc}
 
 \begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
-Register a timeout handler function \var{func} to be called with the \var{args}
-argument list when no matching message is received within \var{timeout}
-milliseconds. Raises an \exception{AssertionError} if \var{func} is not
-\function{callable()} or if the \method{after()} method has already been
-invoked.
+Register a timeout handler function \var{func}. The \method{receive()} method
+calls the \var{func} with the \var{args} argument list when it does not receive
+a matching message within \var{timeout} milliseconds. Raises a \code{'badarg'}
+\exception{ExitError} if \var{func} is not \function{callable()} or if
+\var{timeout} is not an integer. Raises an \exception{AssertionError} if the
+\method{after()} method has already been invoked.
 
 If the \method{receive()} method does not find a matching message within
-\var{timeout} milliseconds, it will invoke \var{func} with \var{args} and return
+\var{timeout} milliseconds, it invokes \var{func} with \var{args} and returns
 the result. When a handler function \var{func} is not specified, the
-\method{receive()} method will return \constant{None} if it times out.
+\method{receive()} method returns \constant{None} if it times out.
 
 None of the \var{args} parameters should be \constant{candygram.Message}, since
 there is no message to pass when a timeout occurs.
@@ -464,34 +472,34 @@ there is no message to pass when a timeout occurs.
 
 \begin{methoddesc}{receive}{\optional{timeout\optional{, func\optional{, args\moreargs}}}}
 Find a matching message in the process's mailbox, invoke the related handler
-function, and return the result. When the \method{receive()} method is called,
-the \class{Receiver} object compares the first message in the process's mailbox
-with each of its registered patterns, in the order that the handlers were added
-via the \method{addHandler()} method. If any pattern matches the message, the
-message is removed from the mailbox and the \method{receive()} method will then
-call the associated function and return its result. If no handler function is
-associated with the matching pattern, \method{receive()} will return
-\constant{None}. If no pattern matches the message, the message is left in the
-mailbox and the \method{receive()} method skips to the next message in the
-mailbox and compares it with each of the patterns. It continues on through each
-of the messages in the mailbox until a match is found.
+function, and return the result. The \class{Receiver} object compares the first
+message in the process's mailbox with each of its registered patterns, in the
+order that the patterns were added via the \method{addHandler()} method. If any
+pattern matches the message, this method removes the message from the mailbox,
+calls the associated handler function, and returns its result. If the matching
+pattern does not have a handler function associated with it, this method returns
+\constant{None}. If no pattern matches the message, this method will leave the
+message in the mailbox, skips to the next message in the mailbox, and compares
+it with each of the patterns. It continues on through each of the messages in
+the mailbox until a match is found.
 
-If no message matches any of the patterns, or if the mailbox is empty, the
-\method{receive()} method blocks until the process receives a message that does
-match one of the patterns, or until the given \var{timeout} has elapsed. If no
-\var{timeout} is specified, the \method{receive()} method will block
-indefinitely. If a \var{timeout} is specified, it is equivalent to calling
-\method{after(\var{timeout}, \var{func}, \var{args})} just prior to
-\method{receive()}. An \exception{AssertionError} will therefore be raised if
-\var{func} is not \function{callable()} or if the \method{after()} method has
-already been invoked.
+If no message matches any of the patterns, or if the mailbox is empty, this
+method blocks until the process receives a message that does match one of the
+patterns, or until the given \var{timeout} has elapsed. If no \var{timeout} is
+specified, this method blocks indefinitely. If a \var{timeout} is specified, it
+is equivalent to calling \method{after(\var{timeout}, \var{func}, \var{args})}
+just prior to \method{receive()}. This method raises a \code{'badarg'}
+\exception{ExitError}, therefore, if \var{func} is not \function{callable()} or
+if \var{timeout} is not an integer. It also raises an \exception{AssertionError}
+if a \var{timeout} is specified and the \method{after()} method has already been
+invoked.
 \end{methoddesc}
 
 \begin{methoddesc}{__call__}{\optional{timeout\optional{, func\optional{, args\moreargs}}}}
 \opindex{()}
-An alias for the \method{receive()} method. \method{__call__()} is aliased to
-the \method{receive()} method so that \class{Receiver}s can be used with a
-shortened, more Erlangy syntax. For example:
+An alias for the \method{receive()} method. \method{__call__()} is an alias to
+the \method{receive()} method so that developers can use a shortened, more
+Erlangy syntax with \class{Receiver}s. For example:
 \begin{verbatim}
 >>> def convert():
 ...     r = Receiver()
@@ -503,14 +511,14 @@ shortened, more Erlangy syntax. For example:
 \end{methoddesc}
 
 \begin{methoddesc}{__iter__}{}
-Return an iterator that repeatedly invokes \method{receive()}. The following
-idiom is often encountered in Candygram code:
+Return an iterator that repeatedly invokes \method{receive()}. Candygram code
+often uses the following idiom:
 \begin{verbatim}
 ... while True:
 ...     result = receiver.receive()
 ...     # do whatever with the result...
 \end{verbatim}
-With an iterator, the code above can be spelled like this instead:
+With an iterator, you can spell the code above like this instead:
 \begin{verbatim}
 ... for result in receiver:
 ...     # do whatever with the result...
@@ -538,8 +546,8 @@ their respective values in a message for the whole sequence to match.
 
 \begin{datadesc}{Message}
 When used as a function parameter in \method{Receiver.addHandler()}, the
-parameter will be replaced by the matching message when the hander function is
-invoked.
+\method{Receiver.receive()} method replaces the parameter with the matching
+message when it invokes the handler function.
 \end{datadesc}
 
 
@@ -548,23 +556,23 @@ invoked.
 \subsection{Exceptions}
 
 \begin{excdesc}{ExitError}
-Used to represent \code{'EXIT'} errors in Erlang. If an Erlang function can
+Represents \code{'EXIT'} errors from Erlang. If an Erlang function can
 cause a failure under certain circumstances, then the corresponding Candygram
-function will raise an \exception{ExitError} under the same circumstances.
+function raises an \exception{ExitError} under the same circumstances.
 
-An \exception{ExitError} will also be raised if a linked process terminates for
-a reason other than \code{'normal'}.
+A process also raises an \exception{ExitError} in all of its linked processes
+if it terminates for a reason other than \code{'normal'}.
 
 \begin{notice}[note]
-When a process terminates with a reason other than \code{'normal'}, an
-\exception{ExitError} is not immediately raised in all linked processes.
-The \exception{ExitError} is deferred instead and will be raised the next time
-one of the Candygram functions/methods is called. (Python does not allow you to
-unconditionally interrupt a separate thread.)
+When a process terminates with a reason other than \code{'normal'}, it does not
+immediately raise an \exception{ExitError} in all linked processes. Candygram
+defers the \exception{ExitError} instead, and raises it the next time one of its
+functions or methods is called. (Python does not allow you to unconditionally
+interrupt a separate thread.)
 \end{notice}
 
 \begin{memberdesc}{reason}
-A string that specifies the reason why the \exception{ExitError} was raised.
+Specifies the reason why the \exception{ExitError} was raised. Can be any value.
 \end{memberdesc}
 
 \begin{memberdesc}{proc}
@@ -577,23 +585,23 @@ The process that originally caused the \exception{ExitError}.
 
 % ############################################################################
 \section{Examples}
-There should be a directory named \file{examples} somewhere within your
-distribution of Candygram. This directory contains the Candygram equivalents of
-all the sample programs found in chapter 5 and sections 7.2, 7.3, and 7.5 of
-\erlangbook. The files named \file{program_X.X.py} are direct translations of
-the Erlang programs. The files named \file{program_X.X_alt.py} are alternate,
-more liberal translations that use more Pythonic idioms. \note{Since the
-CPython interpreter does not perform tail-call optimization, the tail-recursive
-style of the direct translations is not a recommended practice.}
+There is a directory named \file{examples} within every distribution of
+Candygram. This directory contains the Candygram equivalents of all the sample
+programs found in chapter 5 and sections 7.2, 7.3, and 7.5 of \erlangbook. The
+files named \file{program_X.X.py} are direct translations of the Erlang
+programs. The files named \file{program_X.X_alt.py} are alternate, more liberal
+translations that use more Pythonic idioms. \note{Since the CPython interpreter
+does not perform tail-call optimization, the tail-recursive style of the direct
+translations is not a recommended practice.}
 
 The \file{examples} directory also contains a few other modules that demonstrate
-how Candygram can be used to perform some handy functions.
+how you can Candygram to perform some handy functions.
 
-For those who are not already familiar with Erlang, the best way to become
-familiar with Candygram is to read chapter 5 in \erlangbook\ and follow along
-using the example programs located in the \file{examples} directory. For those
-who are already familiar with Erlang, here are a few code snippits to give you a
-taste of Candygram.
+If you are not already familiar with Erlang, the best way to become familiar
+with Candygram is to read chapter 5 in \erlangbook\ and follow along using the
+example programs located in the \file{examples} directory. If you are already
+familiar with Erlang, here are a few code snippets to give you a taste of
+Candygram.
 
 \begin{verbatim}
 >>> from candygram import *
@@ -608,28 +616,28 @@ taste of Candygram.
 >>> proc | 'land shark'
 >>> proc | 'candygram'
 \end{verbatim}
-Running the above code produces the following output:
+Running the code above produces the following output:
 \begin{verbatim}
 Go Away land shark
 Hello candygram
 \end{verbatim}
 
-The above code uses a rather Erlangy syntax. Here is a more Pythonic version
+The code above uses a rather Erlangy syntax. Here is a more Pythonic version
 that does the same:
 \begin{verbatim}
 >>> import candygram as cg
->>> def shut_door(name):
-...     return 'Go Away ' + name
-...
->>> def open_door(name):
-...     return 'Hello ' + name
-...
 >>> def proc_func():
 ...     r = cg.Receiver()
 ...     r.addHandler('land shark', shut_door, cg.Message)
 ...     r.addHandler('candygram', open_door, cg.Message)
 ...     for message in r:
 ...         print message
+...
+>>> def shut_door(name):
+...     return 'Go Away ' + name
+...
+>>> def open_door(name):
+...     return 'Hello ' + name
 ...
 >>> proc = cg.spawn(proc_func)
 >>> proc.send('land shark')
@@ -639,6 +647,14 @@ that does the same:
 Lastly, here is an example with more elaborate patterns:
 \begin{verbatim}
 >>> from candygram import *
+>>> def proc_func(name):
+...     r = Receiver()
+...     r['msg', Process, str] = print_string, name, Message
+...     r['msg', Process, str, Any] = print_any, name, Message
+...     r[Any]  # Ignore any other messages
+...     for result in r:
+...         pass
+...
 >>> def print_string(name, message):
 ...     msg, process, string = message
 ...     # 'msg' and 'process' are unused
@@ -649,21 +665,13 @@ Lastly, here is an example with more elaborate patterns:
 ...     # 'send' and 'process' are unused
 ...     print '%s received: %s %s' % (name, prefix, value)
 ...
->>> def proc_func(name):
-...     r = Receiver()
-...     r['msg', Process, str] = print_string, name, Message
-...     r['msg', Process, str, Any] = print_any, name, Message
-...     r[Any]  # Ignore any other messages
-...     for result in r:
-...         pass
-...
 >>> a = spawn(proc_func, 'A')
 >>> b = spawn(proc_func, 'B')
 >>> a | ('msg', b, 'Girl Scout cookies')
 >>> a | 'plumber?'
 >>> a | ('msg', b, 'The meaning of life is:', 42)
 \end{verbatim}
-Running the above code produces the following output:
+Running the code above produces the following output:
 \begin{verbatim}
 A received: Girl Scout cookies
 A received: The meaning of life is: 42
@@ -680,14 +688,14 @@ Yield a Good Reference to Anything Meaningful.''
 
 \subsection{But wait, doesn't that spell {\sc cadnygram}?}
 Yes, you are quite observant. In order to form a compromise with the French
-acronym, which is {\sc canydgram}, the official acronym was standardized as
-{\sc Candygram}.
+acronym, which is {\sc canydgram}, the Candygram committee standardized the
+official acronym as {\sc Candygram}.
 
 \subsection{How do you pronounce Candygram?}
 This question produces an outrageous amount of heated debate. Some claim that
-it is pronounced with short A's, as in tomato, while others claim that it is
-pronounced with long A's, as in potato. Both sides, however, are completely
-wrong; the name Candygram is correctly pronounced ``throat warbler mangrove.''
+you pronounce it with short A's, as in tomato, while others claim that you
+pronounce it with long A's, as in potato. Both sides, however, are completely
+wrong; the correct pronunciation for Candygram is ``throat warbler mangrove.''
 
 
 
