@@ -21,8 +21,6 @@
 import thread_impl
 import types
 
-# TODO: test program 7.2 behavior against current Erlang
-
 
 def spawn(func, *args, **kwargs):
 	_checkSignal()

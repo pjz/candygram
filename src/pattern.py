@@ -26,9 +26,6 @@ Any = object()
 AnyRemaining = object()
 
 
-# TODO: check to see if these could be made more efficient with regex algorithms
-# that create a state machine.
-
 def genFilter(pattern):
 	t = type(pattern)
 	if t is types.TupleType or t is types.ListType:

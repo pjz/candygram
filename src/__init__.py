@@ -23,10 +23,7 @@ from process import Process
 from receiver import Receiver, Message
 from pattern import Any, AnyRemaining
 
-# TODO: verify that we should use __all__ (Isn't it for listing sub-packages?)
-__all__ = ['Any', 'AnyRemaining', 'Message', 'self', 'self_', 'spawn',
-		'spawnLink', 'link', 'unlink', 'exit', 'processes', 'send', 'processFlag',
-		'Process', 'Receiver', 'ExitError']
-
+# Even though the framework is present for multiple threading models, we only
+# support the default right now.
 import thread_impl
 thread_impl.setImplementation(thread_impl.DEFAULT)

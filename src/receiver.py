@@ -153,9 +153,6 @@ class Receiver:
 		del self.__mailbox[i]
 		for ref in self.__receiverRefs:
 			receiver = ref()
-			# TODO: check interplay between __del__() and weakref
-			#~ if receiver is None:
-				#~ continue
 			assert receiver is not None  # __finalizeRef() should not leave any strays
 			if receiver.__lastMessage > i:
 				receiver.__lastMessage -= 1

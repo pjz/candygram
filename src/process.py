@@ -66,7 +66,6 @@ class Process:
 		self.__signalLock.acquire()
 		try:
 			self._removeLink(signal.proc)
-			# TODO: check what is sent to linked processes when reason == 'kill'
 			if self.__trapExit and signal.reason != 'kill':
 				self.send(('EXIT', signal.proc, signal.reason))
 				return
