@@ -1,4 +1,4 @@
-# thread_impl.py
+# threadimpl.py
 #
 # Copyright (c) 2004 Michael Hobbs
 #
@@ -20,9 +20,11 @@
 
 """provides threading primitives"""
 
-__revision__ = '$Id: thread_impl.py,v 1.4 2004/08/18 21:23:56 hobb0001 Exp $'
+__revision__ = '$Id: threadimpl.py,v 1.1 2004/08/19 23:14:50 hobb0001 Exp $'
+
 
 import thread
+
 
 # If we ever use a different implementation (like, say, stackless) use an
 # environment variable to specify which implementation, a la pychecker.
