@@ -20,16 +20,15 @@
 
 """Pattern filter generator"""
 
-__revision__ = '$Id: pattern.py,v 1.7 2004/08/20 23:23:21 hobb0001 Exp $'
+__revision__ = '$Id: pattern.py,v 1.8 2004/09/02 23:15:57 hobb0001 Exp $'
 
 
 import types
 
 
-# Generate a unique values for 'Any' and 'AnyRemaining' so that they won't ever
-# be confused with any other value.
+# Generate a unique value for 'Any' so that it won't ever be confused with any
+# other value.
 Any = object()
-AnyRemaining = object()
 
 
 def genFilter(pattern):
@@ -73,9 +72,9 @@ def genSeqFilter(seq):
 	"""gen filter for a sequence pattern"""
 	# Define these values as constants outside of the filt() function so that
 	# the filter will not have to re-calculate the values every time it's called.
-	anyRemaining = False
-	if seq and seq[-1] is AnyRemaining:
-		anyRemaining = True
+	lastFilter = None
+	if isinstance(seq, list) and seq:
+		lastFilter = genFilter(seq[-1])
 		seq = seq[:-1]
 	seqType = type(seq)
 	seqLen = len(seq)
@@ -85,12 +84,15 @@ def genSeqFilter(seq):
 		"""resulting filter function"""
 		if not isinstance(x, seqType):
 			return False
-		if anyRemaining and len(x) < seqLen:
-			return False
-		if not anyRemaining and len(x) != seqLen:
+		if len(x) < seqLen:
 			return False
 		for i in seqRange:
 			if not subFilters[i](x[i]):
+				return False
+			# end if
+		for value in x[seqLen:]:
+			# Don't allow any excess values if lastFilter hasn't been set.
+			if lastFilter is None or not lastFilter(value):
 				return False
 			# end if
 		return True

@@ -20,16 +20,16 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: __init__.py,v 1.6 2004/08/19 22:35:47 hobb0001 Exp $'
+__revision__ = '$Id: __init__.py,v 1.7 2004/09/02 23:15:57 hobb0001 Exp $'
 
 
 from candygram.main import spawn, spawnLink, self, self_, exit, link, unlink, \
 		processFlag, processes, isProcessAlive, send, ExitError
 from candygram.process import Process
 from candygram.receiver import Receiver, Message
-from candygram.pattern import Any, AnyRemaining
+from candygram.pattern import Any
 
 
 __all__ = ['spawn', 'spawnLink', 'self', 'self_', 'exit', 'link', 'unlink',
 		'processFlag', 'processes', 'isProcessAlive', 'send', 'ExitError',
-		'Process', 'Receiver', 'Message', 'Any', 'AnyRemaining']
+		'Process', 'Receiver', 'Message', 'Any']

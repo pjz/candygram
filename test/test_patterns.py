@@ -76,20 +76,34 @@ class TestPatterns(unittest.TestCase):
 		self.assertNonMatch(['shark', 42])
 		self.assertNonMatch(('dolphin', 42, 0))
 
-	def testAnyRemaining(self):
-		self.setPattern((str, int, cg.AnyRemaining))
-		self.assertMatch(('text', 0))
-		self.assertMatch(('text', 42, 0.9))
-		self.assertNonMatch(('text',))
-		self.assertNonMatch((42, 'text'))
+	def testTuple2(self):
+		self.setPattern((str, 20, lambda x: x < 0))
+		self.assertMatch(('shark', 20, -54.76))
+		self.assertMatch(('dolphin', 20, -1))
+		self.assertNonMatch(('shark', 21, -6))
+		self.assertNonMatch((20, 20, -1))
+		self.assertNonMatch(('', 20))
 
 	def testList(self):
-		self.setPattern([str, 20, lambda x: x < 0])
-		self.assertMatch(['shark', 20, -54.76])
-		self.assertMatch(['dolphin', 20, -1])
-		self.assertNonMatch(['shark', 21, -6])
-		self.assertNonMatch([20, 20, -1])
-		self.assertNonMatch(['', 20])
+		self.setPattern(['A', str, str])
+		self.assertMatch(['A', 'B', 'C', 'D'])
+		self.assertMatch(['A', 'B'])
+		self.assertNonMatch(['C', 'B', 'A'])
+		self.assertNonMatch(['A'])
+
+	def testList2(self):
+		self.setPattern([str, int])
+		self.assertMatch(['dolphin', 42, 0])
+		self.assertMatch(['shark'])
+		self.assertNonMatch([42, 0])
+		self.assertNonMatch(['dolphin', 42, 'shark'])
+
+	def testList3(self):
+		self.setPattern([cg.Any])
+		self.assertMatch(['dolphin', 42, 0.9])
+		self.assertMatch([])
+		self.assertNonMatch(('dolphin', 42, 0.9))
+		self.assertNonMatch('shark')
 
 	def testDict(self):
 		self.setPattern({'S': int, 19: str})

@@ -139,14 +139,15 @@ interprets it in the following way:
 		\function{isinstance()} of the type or class will match.
 	\item If the value is \function{callable()}, then a message will match if the
 		function/method returns \constant{True} when called with the message.
-	\item If the value is a list or tuple, then a message will match only if it
-		is a list or tuple, respectively, and of the same length. Also, each value
-		in the sequence is used as a pattern and the sequence as a whole will
-		match only if every pattern in the sequence matches its associated value in
-		the message.
-	\item If the value is a list or tuple, and the last item in the sequence is
-		\constant{candygram.AnyRemaining}, then the above rule applies except that
-		the message sequence may be any length that is \greaterthan= len(pattern)-1.
+	\item If the value is a tuple, then a message will match only if it	is a tuple
+		of the same length. Also, each value in the tuple is used as a pattern and
+		the tuple as a whole will match only if every sub-pattern in the tuple
+		matches its associated value in the message.
+	\item If the value is a list, then the same rule for tuples applies, except
+		for the last sub-pattern. The last sub-pattern in the list can match zero or
+		more values in the message. That is, the length of the message may be
+		\greaterthan\= len(pattern)-1 as long as all excess values match the last
+		sub-pattern.
 	\item If the value is a dictionary, then a message will match only if it
 		is a dictionary that contains all of the same keys as the pattern value.
 		Also, each value in the dictionary is used as a pattern and the
@@ -183,12 +184,18 @@ that do not match the pattern.
 \lineiii{(str, int)}
 	{('shark', 42), ('dolphin', 0)}
 	{['shark', 42], ('dolphin', 42, 0)}
-\lineiii{(str, int, AnyRemaining)}
-	{('text', 0), ('text', 42, 0.9)}
-	{('text',), (42, 'text')}
-\lineiii{[str, 20, lambda x: x \lessthan\ 0]}
-	{['shark', 20, -54.76], ['dolphin', 20, -1]}
-	{['shark', 21, -6], [20, 20, -1], ['', 20]}
+\lineiii{(str, 20, lambda x: x \lessthan\ 0)}
+	{('shark', 20, -54.76), ('dolphin', 20, -1)}
+	{('shark', 21, -6), (20, 20, -1), ('', 20)}
+\lineiii{['A', str, str]}
+	{['A', 'B', 'C', 'D'], ['A', 'B']}
+	{['C', 'B', 'A'], ['A']}
+\lineiii{[str, int]}
+	{['dolphin', 42, 0], ['shark']}
+	{[42, 0], ['dolphin', 42, 'shark']}
+\lineiii{[Any]}
+	{['dolphin', 42, 0.9], []}
+	{('dolphin', 42, 0.9), 'shark'}
 \lineiii{\{'S': int, 19: str\}}
 	{\{'S': 3, 19: 'foo'\}, \{'S': -65, 19: 'bar', 'T': 'me'\}}
 	{\{'S': 'Charlie', 19: 'foo'\}, \{'S': 3\}}
@@ -534,14 +541,6 @@ With an iterator, you can spell the code above like this instead:
 
 \begin{datadesc}{Any}
 When used in a pattern, the \constant{Any} constant will match any value.
-\end{datadesc}
-
-\begin{datadesc}{AnyRemaining}
-When used in the last position of a tuple or list pattern, the
-\constant{AnyRemaining} constant will cause the sequence to match a sequence of
-the same kind (tuple or list) that has a length \greaterthan= len(pattern)-1.
-The patterns in the sequence prior to \constant{AnyRemaining} must still match
-their respective values in a message for the whole sequence to match.
 \end{datadesc}
 
 \begin{datadesc}{Message}
