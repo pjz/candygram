@@ -28,6 +28,7 @@ class Process:
 		r = Receiver()
 		r.addHandler(('stop', Any), self.stop_, Message)
 		r.addHandler(Any)
-		while not self.stop:
-			r.receive()
+		for _ in r:
+			if self.stop:
+				break
 		return True

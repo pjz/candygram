@@ -35,8 +35,8 @@ class Top:
 		link(self.next)
 		r = Receiver()
 		r.addHandler(Any, self.fun, Message)
-		while True:
-			r.receive()
+		for _ in r:
+			pass
 		return True
 
 class Top1:
@@ -51,8 +51,8 @@ class Top1:
 		r = Receiver()
 		r.addHandler('stop', self.stop)
 		r.addHandler(Any, self.fun, Message)
-		while True:
-			r.receive()
+		for _ in r:
+			pass
 		return True
 
 def test(mess):

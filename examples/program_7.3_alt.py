@@ -41,8 +41,9 @@ class Demo1:
 		r.addHandler(('EXIT', Process, Any), self.otherExit, Message)
 		r.addHandler('finished_demo', self.finished)
 		r.addHandler(Any, self.other, Message)
-		while not self.stop:
-			r.receive()
+		for _ in r:
+			if self.stop:
+				break
 		return True
 
 def demonstrate_normal():

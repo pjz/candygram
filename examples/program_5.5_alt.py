@@ -44,6 +44,6 @@ class Server:
 		r = Receiver()
 		r.addHandler((Process, ('analyse',str)), self.sendAnal, Message)
 		r.addHandler((Process, ('add_number', str, Any)), self.sendAck, Message)
-		while True:
-			r.receive()
+		for _ in r:
+			pass
 		return True

@@ -43,6 +43,7 @@ class Loop:
 		r.addHandler((Process, 'value'), self.sendVal, Message)
 		r.addHandler('stop', self.stopFunc)
 		r.addHandler(Any) # All other messages
-		while not self.stop:
-			r.receive()
+		for _ in r:
+			if self.stop:
+				break
 		return True

@@ -31,3 +31,7 @@ class PriorityReceiver:
 		return self.__receivers[-1].receive(*args, **kwargs)
 
 	__call__ = receive
+	next = receive
+
+	def __iter__(self):
+		return self

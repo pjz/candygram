@@ -18,6 +18,6 @@ class Loop:
 	def loop(self):
 		r = Receiver()
 		r.addHandler('increment', self.increment)
-		while True:
-			r.receive()
+		for _ in r:
+			pass
 		pass

@@ -59,8 +59,8 @@ class SlidingWindow:
 		r['ack', Process] = self.__ack, Message
 		r[Process, Process, Any] = self.__send, Message
 		r[Any] = lambda: None  # ignore spurrious messages
-		while True:
-			r()
+		for _ in r:
+			pass
 		pass
 
 	def __setMaxSize(self, message):

@@ -36,8 +36,8 @@ class Server:
 		r = Receiver()
 		r.addHandler((Process,'alloc'), self.allocate, Message)
 		r.addHandler((Process,('free',Any)), self.free_, Message)
-		while True:
-			r.receive()
+		for _ in r:
+			pass
 		return True
 
 	def allocate(self, msg):
