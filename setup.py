@@ -32,13 +32,13 @@ setup(name = 'Candygram',
 		author = 'Michael Hobbs',
 		author_email = 'mike@hobbshouse.org',
 		description = 'A Python implementation of Erlang concurrency primitives.',
-		long_description = 'Candygram is a Python implementation of Erlang ' \
-				'concurrency primitives. Erlang is widely respected for its elegant ' \
-				'built-in facilities for concurrent programming. This package ' \
-				'attempts to emulate those facilities as closely as possible in ' \
-				'Python. With Candygram, developers can send and receive messages ' \
-				'between threads using semantics nearly identical to those in the ' \
-				'Erlang language.',
+		long_description = \
+				'Candygram is a Python implementation of Erlang concurrency\n' \
+				'primitives. Erlang is widely respected for its elegant built-in\n' \
+				'facilities for concurrent programming. This package attempts to\n' \
+				'emulate those facilities as closely as possible in Python. With\n' \
+				'Candygram, developers can send and receive messages between threads\n'\
+				'using semantics nearly identical to those in the Erlang language.',
 		keywords = ['erlang', 'concurrent', 'threads', 'message', 'passing'],
 		platforms = ['Python'],
 		classifiers = [
