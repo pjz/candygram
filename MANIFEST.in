@@ -1,0 +1,2 @@
+recursive-include examples *.py
+recursive-include doc/candygram *
