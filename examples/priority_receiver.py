@@ -2,12 +2,16 @@
 # priority_receiver.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 TIMEOUT = object
 
+
 def timeout():
 	return TIMEOUT
+
 
 class PriorityReceiver:
 	def __init__(self, receivers):
@@ -20,14 +24,14 @@ class PriorityReceiver:
 			mergedReceiver.addHandlers(receiver)
 			self.__receivers.append(mergedReceiver)
 			prevReceiver = mergedReceiver
-		pass
+		# end for
 
 	def receive(self, *args, **kwargs):
 		for receiver in self.__receivers[:-1]:
 			result = receiver.receive(0, timeout)
 			if result is not TIMEOUT:
 				return result
-			pass
+			# end if
 		return self.__receivers[-1].receive(*args, **kwargs)
 
 	__call__ = receive

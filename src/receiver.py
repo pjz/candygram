@@ -20,13 +20,13 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.6 2004/08/19 23:04:52 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.7 2004/08/20 17:30:25 hobb0001 Exp $'
 
 
 import time
 import weakref
 
-from candygram.main import _checkSignal, self_
+from candygram.main import _checkSignal, self_, ExitError
 from candygram.pattern import genFilter
 
 
@@ -71,8 +71,8 @@ class Receiver:
 		"""add pattern handler to receiver"""
 		_checkSignal()
 		self.__checkOwner()
-		if handler is not None:
-			assert callable(handler), 'The handler value must be callable'
+		if handler is not None and not callable(handler):
+			raise ExitError('badarg')
 		filter_ = genFilter(pattern)
 		self.__handlers.append((filter_, handler, args, kwargs))
 		# Clear all skipped messages, since the new handler might be able to handle
@@ -101,6 +101,8 @@ class Receiver:
 		"""copy handlers from receiver to self"""
 		_checkSignal()
 		self.__checkOwner()
+		if not isinstance(receiver, Receiver):
+			raise ExitError('badarg')
 		self.__handlers.extend(receiver.__handlers)
 		# Clear all skipped messages, since the new handler might be able to handle
 		# them.
@@ -144,9 +146,10 @@ class Receiver:
 		"""set timeout handler"""
 		assert self.__timeout is None, \
 				'A timeout has already been set for this Receiver'
-		assert isinstance(timeout, int), 'The timeout value must be an integer'
-		if handler is not None:
-			assert callable(handler), 'The handler value must be callable'
+		if not isinstance(timeout, int):
+			raise ExitError('badarg')
+		if handler is not None and not callable(handler):
+			raise ExitError('badarg')
 		# Timeout is specified in milliseconds
 		self.__timeout = float(timeout) / 1000
 		self.__timeoutHandler = handler
