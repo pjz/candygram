@@ -135,7 +135,7 @@ first parameter passed to the \method{Receiver.addHandler()} method
 value as a pattern and interprets it in the following way:
 \begin{enumerate}
 	\item If the value is \constant{candygram.Any}, then any message will match.
-	\item If the value is a class object or a type object, then any message that
+	\item If the value is a class or a type object, then any message that
 		\function{isinstance()} of the class or type will match.
 	\item If the value is a function or method, then a message will match if the
 		function/method returns \constant{True} when called with the message.
@@ -144,11 +144,11 @@ value as a pattern and interprets it in the following way:
 		in the sequence is then used as a pattern and the sequence as a whole will
 		match only if every pattern in the sequence matches.
 	\item If the value is a list or tuple, and the last item in the sequence is
-		\constant{candygram.AnyRemaining}, then the above rules apply except that
+		\constant{candygram.AnyRemaining}, then the above rule applies except that
 		the message sequence may be any length that is \greaterthan= len(pattern)-1.
 	\item If the value is a dictionary, then a message will match only if it
 		is a dictionary that contains all of the same keys as the pattern value.
-		Also, each value in the dictionary is then used and a pattern and the
+		Also, each value in the dictionary is then used as a pattern and the
 		dictionary as a whole will match only if every pattern in the dictionary
 		matches its associated value in the message.
 	\item Lastly, any other value is treated as a literal pattern. That is, a
@@ -201,7 +201,7 @@ contains Python values that would not match the pattern.
 \declaremodule{extension}{candygram}
 \modulesynopsis{Erlang concurrency primitives}
 
-The following functions, classes, and constants are exported by the
+The following functions, classes, constants, and exceptions are exported by the
 \module{candygram} module. Since the name \module{candygram} is a bit long, the
 module is typically imported in one of the following ways:
 \begin{verbatim}
