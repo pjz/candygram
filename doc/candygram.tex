@@ -388,11 +388,9 @@ pattern. Refer to section \ref{patterns} for details about how to specify
 message patterns.
 
 \begin{notice}[warning]
-You may not use a single \class{Receiver} instance across multiple processes.
-The \class{Receiver} raises an \exception{AssertionError} if you call one
-of its methods from a process other than the one that created it. You should
-take care, therefore, to create a \class{Receiver} within the process that will
-be using it.
+You may not call \method{Receiver.receive()} from any process other than the
+one that created the \class{Receiver} instance. You should take care, therefore,
+to create a \class{Receiver} within the process that will be using it.
 \end{notice}
 
 \begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, args\moreargs}}}
