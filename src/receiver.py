@@ -20,20 +20,25 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.4 2004/08/18 22:10:24 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.5 2004/08/19 22:54:55 hobb0001 Exp $'
 
-from candygram import _checkSignal, self_
-from pattern import genFilter
-import types
+
 import time
 import weakref
 
+from candygram.main import _checkSignal, self_
+from candygram.pattern import genFilter
 
 
+# Generate a unique value for 'Message' so that it won't ever be confused with
+# any other value.
 Message = object()
 
+
 class Receiver:
+
 	"""Retrieves messages from process's mailbox"""
+
 	def __init__(self):
 		_checkSignal()
 		self.__handlers = []
@@ -59,7 +64,7 @@ class Receiver:
 			if self.__receiverRefs[i]() is ref:
 				del self.__receiverRefs[i]
 				break
-			pass
+			# end if
 		self.__receiverRefsLock.release()
 
 	def addHandler(self, pattern, handler=None, *args, **kwargs):
@@ -67,7 +72,7 @@ class Receiver:
 		_checkSignal()
 		self.__checkOwner()
 		if handler is not None:
-			assert callable(handler),'The handler value must be callable'
+			assert callable(handler), 'The handler value must be callable'
 		filter_ = genFilter(pattern)
 		self.__handlers.append((filter_, handler, args, kwargs))
 		# Clear all skipped messages, since the new handler might be able to handle
@@ -82,11 +87,11 @@ class Receiver:
 		self.__setAfter(timeout, handler, args, kwargs)
 
 	def __setitem__(self, key, value):
-		if type(value) is types.TupleType:
+		if isinstance(value, tuple):
 			self.addHandler(key, value[0], *value[1:])
 		else:
 			self.addHandler(key, value)
-		pass
+		# end if
 
 	def __getitem__(self, key):
 		self.addHandler(key)
@@ -118,7 +123,7 @@ class Receiver:
 			# until a new message is sent and then try again.
 			if handlerInfo is None:
 				handlerInfo = self.__wait(expire)
-			pass
+			# end if
 		self.__mailboxCondition.release()
 		if timeout is not None:
 			self.__removeAfter()
@@ -137,11 +142,11 @@ class Receiver:
 
 	def __setAfter(self, timeout, handler, args, kwargs):
 		"""set timeout handler"""
-		assert self.__timeout is None, 'A timeout has already been set for this '\
-				'Receiver'
-		assert type(timeout) is types.IntType,'The timeout value must be an integer'
+		assert self.__timeout is None, \
+				'A timeout has already been set for this Receiver'
+		assert isinstance(timeout, int), 'The timeout value must be an integer'
 		if handler is not None:
-			assert callable(handler),'The handler value must be callable'
+			assert callable(handler), 'The handler value must be callable'
 		# Timeout is specified in milliseconds
 		self.__timeout = float(timeout) / 1000
 		self.__timeoutHandler = handler
@@ -165,7 +170,7 @@ class Receiver:
 				if filter_(message):
 					self.__deleteMessage(i)
 					return message, handler, args, kwargs
-				pass
+				# end if
 			self.__lastMessage = i + 1
 		return None
 
@@ -179,7 +184,7 @@ class Receiver:
 			assert receiver is not None  # __finalizeRef() should not leave any strays
 			if receiver.__lastMessage > i:
 				receiver.__lastMessage -= 1
-			pass
+			# end if
 		self.__receiverRefsLock.release()
 
 	def __wait(self, expire):
@@ -196,19 +201,18 @@ class Receiver:
 
 	def __checkOwner(self):
 		"""check that current process is owner of this receiver"""
-		assert self_() is self.__owner, 'Only the process that created a Receiver '\
-				'may invoke its methods'
+		assert self_() is self.__owner, \
+				'Only the process that created a Receiver may invoke its methods'
+
 
 def _replaceMessageArgs(args, message):
 	"""replace any instance of Message with message"""
-	result = []
-	for arg in args:
+	def change(arg):
 		if arg is Message:
-			result.append(message)
-		else:
-			result.append(arg)
-		pass
-	return result
+			return message
+		return arg
+	return [change(arg) for arg in args]
+
 
 def _replaceMessageKWArgs(kwargs, message):
 	"""replace any instance of Message with message"""
@@ -218,5 +222,5 @@ def _replaceMessageKWArgs(kwargs, message):
 			result[key] = message
 		else:
 			result[key] = value
-		pass
+		# end if
 	return result
