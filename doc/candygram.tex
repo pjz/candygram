@@ -130,9 +130,9 @@ functions described in chapter 5 and sections 7.2, 7.3, and 7.5 of that book.
 Erlang provides pattern matching in its very syntax, which the \keyword{receive}
 statement uses to its advantage. Since Python does not provide pattern matching
 in its syntax, we must use a slightly different mechanism to match messages. The
-first parameter passed to the \method{Receiver.addHandler()} method
-[\ref{Receiver}] can be any Python value. The \addhandler\ method uses this
-value as a pattern and interprets it in the following way:
+first argument passed to the \method{Receiver.addHandler()} method can be any
+Python value. The \addhandler\ method uses this value as a pattern and
+interprets it in the following way:
 \begin{enumerate}
 	\item If the value is \constant{candygram.Any}, then any message will match.
 	\item If the value is a type object or a class, then any message that
@@ -163,19 +163,19 @@ Python values that match the pattern and the third column contains Python values
 that do not match the pattern.
 \begin{tableiii}{l|l|l}{textrm}{Pattern}{Matches}{Non-Matches}
 \lineiii{Any}
-	{'shark', 13.7, (1, '', lambda: true)}
+	{'text', 13.7, (1, '', lambda: true)}
 	{}
-\lineiii{'shark'}
-	{'shark'}
+\lineiii{'land shark'}
+	{'land shark'}
 	{'dolphin', 42, []}
 \lineiii{13.7}
 	{13.7}
-	{'shark', 13.6, \{'A': 14\}}
+	{'text', 13.6, \{'A': 14\}}
 \lineiii{int}
 	{13, 42, 0}
-	{'shark', 13.7, []}
+	{'text', 13.7, []}
 \lineiii{str}
-	{'shark', '', 'dolphin'}
+	{'plumber', ''}
 	{42, 0.9, lambda: True}
 \lineiii{lambda x: x \greaterthan\ 20}
 	{42, 100, 67.7}
@@ -184,8 +184,8 @@ that do not match the pattern.
 	{('shark', 42), ('dolphin', 0)}
 	{['shark', 42], ('dolphin', 42, 0)}
 \lineiii{(str, int, AnyRemaining)}
-	{('dolphin', 0), ('dolphin', 42, 0.9)}
-	{('dolphin',), (42, 'dolphin')}
+	{('text', 0), ('text', 42, 0.9)}
+	{('text',), (42, 'text')}
 \lineiii{[str, 20, lambda x: x \lessthan\ 0]}
 	{['shark', 20, -54.76], ['dolphin', 20, -1]}
 	{['shark', 21, -6], [20, 20, -1], ['', 20]}
@@ -221,8 +221,9 @@ or
 \begin{funcdesc}{spawn}{func\optional{, args\moreargs}}
 Create a new concurrent process by calling the function \var{func} with the
 \var{args} argument list and return the resulting \class{Process} instance.
-When the function returns, the process terminates. Raises a \code{'badarg'}
-\exception{ExitError} if \var{func} is not \function{callable()}.
+When the function \var{func} returns, the process terminates. Raises a
+\code{'badarg'} \exception{ExitError} if \var{func} is not
+\function{callable()}.
 \end{funcdesc}
 
 \begin{funcdesc}{link}{proc}
@@ -303,9 +304,9 @@ exits. If \var{proc} is not trapping exits, however, the \var{proc} process
 terminates and propagates the \code{'EXIT'} signal in turn to its linked
 processes.
 
-If the \var{reason} is the string \code{'kill'}, for example
-\code{exit(proc, 'kill')}, an untrappable \code{'EXIT'} signal is sent to the
-process. In other words, the \var{proc} process is unconditionally killed.
+If the \var{reason} is the string \code{'kill'}, an untrappable \code{'EXIT'}
+signal is sent to the process. In other words, the \var{proc} process is
+unconditionally killed.
 
 Refer to the \function{processFlag()} function for details about trapping exits.
 \end{funcdesc}
@@ -360,9 +361,9 @@ always delivered, and always in the same order they were sent.
 
 \begin{methoddesc}{__or__}{message}
 \opindex{|}
-An alias for the \method{send()} method. The OR operator, `\pipe', is aliased to
-the \method{send()} method so that developers can use a more Erlangy syntax to
-send messages. In Erlang, the `!' primitive sends messages. For example:
+An alias for the \method{send()} method. The OR operator, `\pipe', is an alias
+to the \method{send()} method so that developers can use a more Erlangy syntax
+to send messages. In Erlang, the `!' primitive sends messages. For example:
 \begin{verbatim}
 >>> proc | ('knock-knock', 'candygram')
 \end{verbatim}
@@ -382,8 +383,9 @@ which contains messages that have been sent to it via the \method{send()}
 method. To retrieve the messages out of the mailbox, a process must use a
 \class{Receiver} object. Like the \keyword{receive} statement in Erlang, a
 \class{Receiver} object compares an incoming message against multiple patterns
-[\ref{patterns}] and invokes the callback function that is associated
-with the first matching pattern.
+and invokes the callback function that is associated with the first matching
+pattern. Refer to section \ref{patterns} for details about how to specify
+message patterns.
 
 \begin{notice}[warning]
 You may not use a single \class{Receiver} instance across multiple processes.
@@ -403,8 +405,8 @@ section \ref{patterns} for details about how to specify message patterns. Raises
 a \code{'badarg'} \exception{ExitError} if \var{func} is not
 \function{callable()}.
 
-If any of the \var{args} parameters is \constant{candygram.Message}, then the
-\method{receive()} method replaces that parameter with the matching message when
+If any of the \var{args} arguments is \constant{candygram.Message}, then the
+\method{receive()} method replaces that argument with the matching message when
 it invokes \var{func}.
 
 Refer to the \method{receive()} documentation for details about the
@@ -440,7 +442,7 @@ developers can use a more Erlangy syntax to specify handlers. In Erlang, the
 example:
 \begin{verbatim}
 >>> r = Receiver()
->>> r['knock-knock', 'dolphin']  # ignore dolphins
+>>> r['knock-knock', 'shark']  # ignore sharks
 \end{verbatim}
 \end{methoddesc}
 
@@ -466,7 +468,7 @@ If the \method{receive()} method does not find a matching message within
 the result. When a handler function \var{func} is not specified, the
 \method{receive()} method returns \constant{None} if it times out.
 
-None of the \var{args} parameters should be \constant{candygram.Message}, since
+None of the \var{args} arguments should be \constant{candygram.Message}, since
 there is no message to pass when a timeout occurs.
 \end{methoddesc}
 
@@ -478,7 +480,7 @@ order that the patterns were added via the \method{addHandler()} method. If any
 pattern matches the message, this method removes the message from the mailbox,
 calls the associated handler function, and returns its result. If the matching
 pattern does not have a handler function associated with it, this method returns
-\constant{None}. If no pattern matches the message, this method will leave the
+\constant{None}. If no pattern matches the message, this method leaves the
 message in the mailbox, skips to the next message in the mailbox, and compares
 it with each of the patterns. It continues on through each of the messages in
 the mailbox until a match is found.
@@ -488,10 +490,10 @@ method blocks until the process receives a message that does match one of the
 patterns, or until the given \var{timeout} has elapsed. If no \var{timeout} is
 specified, this method blocks indefinitely. If a \var{timeout} is specified, it
 is equivalent to calling \method{after(\var{timeout}, \var{func}, \var{args})}
-just prior to \method{receive()}. This method raises a \code{'badarg'}
-\exception{ExitError}, therefore, if \var{func} is not \function{callable()} or
-if \var{timeout} is not an integer. It also raises an \exception{AssertionError}
-if a \var{timeout} is specified and the \method{after()} method has already been
+just prior to \method{receive()}. Raises a \code{'badarg'}
+\exception{ExitError} if \var{func} is not \function{callable()} or if
+\var{timeout} is not an integer. Also raises an \exception{AssertionError} if a
+\var{timeout} is specified and the \method{after()} method has already been
 invoked.
 \end{methoddesc}
 
@@ -545,8 +547,8 @@ their respective values in a message for the whole sequence to match.
 \end{datadesc}
 
 \begin{datadesc}{Message}
-When used as a function parameter in \method{Receiver.addHandler()}, the
-\method{Receiver.receive()} method replaces the parameter with the matching
+When used as a function argument in \method{Receiver.addHandler()}, the
+\method{Receiver.receive()} method replaces the argument with the matching
 message when it invokes the handler function.
 \end{datadesc}
 
@@ -595,7 +597,7 @@ does not perform tail-call optimization, the tail-recursive style of the direct
 translations is not a recommended practice.}
 
 The \file{examples} directory also contains a few other modules that demonstrate
-how you can Candygram to perform some handy functions.
+how you can use Candygram to perform some handy functions.
 
 If you are not already familiar with Erlang, the best way to become familiar
 with Candygram is to read chapter 5 in \erlangbook\ and follow along using the
@@ -682,7 +684,7 @@ A received: The meaning of life is: 42
 % ############################################################################
 \section{FAQ}
 
-\subsection{Why is the package called Candygram?}
+\subsection{Why is the package named Candygram?}
 The name Candygram is actually an acronym for ``the Candygram Acronym Does Not
 Yield a Good Reference to Anything Meaningful.''
 

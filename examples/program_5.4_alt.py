@@ -27,4 +27,5 @@ class Timer:
 	def timer(self):
 		r = Receiver()
 		r.addHandler((Process, 'cancel'))
-		r.receive(self.time, self.timeout)
+		r.after(self.time, self.timeout)
+		r.receive()
