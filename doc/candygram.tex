@@ -160,7 +160,7 @@ interprets it in the following way:
 
 \subsection{Examples}
 Let's illustrate these rules by example.\footnote
-{Do not use all of these examples at home. These are highly trained stunt
+{Do not use all of these patterns at home. These are highly trained stunt
 patterns and are displayed here for demonstration purposes only. Specifically,
 you should rarely ever use more than one sub-pattern in a list pattern, nor
 should you ever use more than one type of key in a single dictionary.}
@@ -470,12 +470,12 @@ Raises a \code{'badarg'} \exception{ExitError} if \var{receiver} is not a
 \end{methoddesc}
 
 \begin{methoddesc}{removeHandler}{handlerReference}
-Remove a handler function. The \var{handlerReference} is returned by the
-\method{addHandler()} and \method{addHandlers()} methods. Since all handler
-references are unique, this method will remove exactly one handler function
+Remove a handler function. The \var{handlerReference} must be a value returned
+by either the \method{addHandler()} or \method{addHandlers()} method. Since all
+handler references are unique, this method removes exactly one handler function
 from the \class{Receiver}. Raises a \code{'badarg'} \exception{ExitError} if
 \var{handlerReference} is not a proper reference, or if it refers to a handler
-function that is no longer in in the \class{Receiver}.
+function that is not in the \class{Receiver}.
 \end{methoddesc}
 
 \begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
@@ -646,7 +646,7 @@ Hello candygram
 If this code is run as a script, the Python interpreter will exit after the last
 line is evaluated, killing any spawned processes. That is why the last line is
 a call to the \function{sleep()} function, so that the spawned process has an
-opportunity to print its message before the interpreter exits and kills it.
+opportunity to print its messages before the interpreter exits and kills it.
 \end{notice}
 
 The code above uses a rather Erlangy syntax. Here is a more Pythonic version
