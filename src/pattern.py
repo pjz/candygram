@@ -20,7 +20,7 @@
 
 """Pattern filter generator"""
 
-__revision__ = '$Id: pattern.py,v 1.4 2004/08/19 23:13:41 hobb0001 Exp $'
+__revision__ = '$Id: pattern.py,v 1.5 2004/08/19 23:18:02 hobb0001 Exp $'
 
 
 import types
@@ -35,7 +35,7 @@ AnyRemaining = object()
 def genFilter(pattern):
 	"""generate a pattern filter"""
 	if isinstance(pattern, tuple) or isinstance(pattern, list):
-		result = genSeqFilter(pattern, t)
+		result = genSeqFilter(pattern)
 	elif isinstance(pattern, dict):
 		result = genDictFilter(pattern)
 	elif isinstance(pattern, type) or type(pattern) is types.ClassType:
@@ -69,7 +69,7 @@ def genTypeFilter(t):
 	return lambda x: isinstance(x, t)
 
 
-def genSeqFilter(seq, seqType):
+def genSeqFilter(seq):
 	"""gen filter for a sequence pattern"""
 	# Define these values as constants outside of the filt() function so that
 	# the filter will not have to re-calculate the values every time it's called.
@@ -77,6 +77,7 @@ def genSeqFilter(seq, seqType):
 	if seq and seq[-1] is AnyRemaining:
 		anyRemaining = True
 		seq = seq[:-1]
+	seqType = type(seq)
 	seqLen = len(seq)
 	subFilters = [genFilter(pattern) for pattern in seq]
 	seqRange = range(seqLen)

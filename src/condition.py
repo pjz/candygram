@@ -36,12 +36,12 @@ simplified by making the following assumptions:
    the lock.
 """
 
-__revision__ = '$Id: condition.py,v 1.3 2004/08/19 23:04:52 hobb0001 Exp $'
+__revision__ = '$Id: condition.py,v 1.4 2004/08/19 23:18:02 hobb0001 Exp $'
 
 
 import time
 
-from candygram.thread_impl import allocateLock
+from candygram.threadimpl import allocateLock
 
 
 class Condition:

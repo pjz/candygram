@@ -20,10 +20,10 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: main.py,v 1.2 2004/08/19 23:04:24 hobb0001 Exp $'
+__revision__ = '$Id: main.py,v 1.3 2004/08/19 23:18:02 hobb0001 Exp $'
 
 
-from candygram.thread_impl import getCurrentThread
+from candygram.threadimpl import getCurrentThread
 
 
 def spawn(func, *args, **kwargs):

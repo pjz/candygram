@@ -20,14 +20,14 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.4 2004/08/19 22:35:47 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.5 2004/08/19 23:18:02 hobb0001 Exp $'
 
 
 import atexit
 import sys
 
 from candygram.main import ExitError, _checkSignal
-from candygram.thread_impl import allocateLock, startThread, getCurrentThread
+from candygram.threadimpl import allocateLock, startThread, getCurrentThread
 from candygram.condition import Condition
 
 
