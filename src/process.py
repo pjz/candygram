@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.7 2004/08/20 21:01:19 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.8 2004/08/24 16:41:41 hobb0001 Exp $'
 
 
 import atexit
@@ -50,6 +50,7 @@ class Process:
 
 	def isAlive(self):
 		"""Return True if process is still running"""
+		_checkSignal()
 		return self.__alive
 
 	isProcessAlive = isAlive
@@ -74,9 +75,9 @@ class Process:
 		"""Send signal to process"""
 		assert isinstance(signal, ExitError)
 		assert signal.proc is not self
+		assert self.isAlive()
 		self.__signalLock.acquire()
 		try:
-			self._removeLink(signal.proc)
 			if self.__trapExit and signal.reason != 'kill':
 				self.send(('EXIT', signal.proc, signal.reason))
 				return
@@ -123,6 +124,7 @@ class Process:
 		links = self.__links.values()
 		self.__linksLock.release()
 		for proc in links:
+			proc._removeLink(self)
 			proc._signal(exitError)
 		# end for
 
@@ -158,10 +160,9 @@ class Process:
 		"""raise an exception for signal"""
 		assert isinstance(signal, ExitError)
 		reason = signal.reason
-		# Check if 'reason' was created by sys.exc_info()
-		if isinstance(reason, tuple) and len(reason) == 3 and \
-				issubclass(reason[0], Exception):
-			raise reason[0], reason[1], reason[2]
+		# Check if 'reason' is an ExceptionReason
+		if isinstance(reason, ExceptionReason):
+			raise reason.excInfo[0], reason.excInfo[1], reason.excInfo[2]
 		raise signal
 
 
@@ -191,7 +192,7 @@ class ThreadProcess(Process):
 		except ExitError, ex:
 			exitError = ex
 		except:
-			exitError = ExitError(sys.exc_info(), self)
+			exitError = ExitError(ExceptionReason(), self)
 		self._exit(exitError)
 		getProcessMapLock().acquire()
 		del getProcessMap()[currentThread]
@@ -210,6 +211,14 @@ class RootProcess(Process):
 		"""invoked when interpreter is exiting"""
 		_checkSignal()
 		self._exit(ExitError('normal', self))
+
+
+class ExceptionReason:
+
+	"""An ExitError reason that specifies that a process raised an exception"""
+
+	def __init__(self):
+		self.excInfo = sys.exc_info()
 
 
 # These values are singletons that are accessed only via getProcessMap*()

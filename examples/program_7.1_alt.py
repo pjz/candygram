@@ -20,7 +20,7 @@ class Process:
 	def __init__(self):
 		self.stop = False
 
-	def stop_(self):
+	def stop_(self, msg):
 		_, method = msg
 		if method == 'return':
 			self.stop = True
@@ -28,7 +28,7 @@ class Process:
 			exit('normal')
 		# end if
 
-	def process():
+	def process(self):
 		r = Receiver()
 		r.addHandler(('stop', Any), self.stop_, Message)
 		r.addHandler(Any)
