@@ -26,14 +26,14 @@ class InstallData(distutils.command.install_data.install_data):
 
 
 setup(name = 'Candygram',
-      version = '1.0b1',
-      license = 'GNU Lesser General Public License',
-      url = 'http://candygram.sourceforge.net',
-      author = 'Michael Hobbs',
-      author_email = 'mike@hobbshouse.org',
-      package_dir = {PACKAGE: 'src'},
-      packages = [PACKAGE],
-      data_files = [(PACKAGE+'/examples', examples),
-                    (PACKAGE+'/docs', docs),
-                    (PACKAGE, ['COPYING'])],
-      cmdclass = {'install_data': InstallData})
+		version = '1.0b1',
+		license = 'GNU Lesser General Public License',
+		url = 'http://candygram.sourceforge.net',
+		author = 'Michael Hobbs',
+		author_email = 'mike@hobbshouse.org',
+		package_dir = {PACKAGE: 'src'},
+		packages = [PACKAGE],
+		data_files = [(PACKAGE+'/examples', examples),
+				(PACKAGE+'/docs', docs),
+				(PACKAGE, ['COPYING'])],
+		cmdclass = {'install_data': InstallData})
