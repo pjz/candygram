@@ -50,16 +50,13 @@ def setImplementation(implType):
 def stackless_get_ident():
 	current = stackless.getcurrent()
 	if current.is_main:
-		#~ print 0
 		return 0
 	frame = current.frame
 	while frame is not None:
 		# Find frame of __run() method of _ThreadProcess
 		if frame.f_back is None and frame.f_code.co_name == '__run':
-			#~ print id(frame.f_locals['self'])
 			return id(frame.f_locals['self'])
 		frame = frame.f_back
-	#~ print 'not found', id(current)
 	return id(current)
 
 def stackless_start_new_thread(func, args):
