@@ -20,7 +20,7 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: main.py,v 1.3 2004/08/19 23:18:02 hobb0001 Exp $'
+__revision__ = '$Id: main.py,v 1.4 2004/09/09 15:47:07 hobb0001 Exp $'
 
 
 from candygram.threadimpl import getCurrentThread
@@ -28,18 +28,26 @@ from candygram.threadimpl import getCurrentThread
 
 def spawn(func, *args, **kwargs):
 	"""spawn new process"""
-	_checkSignal()
-	if not callable(func):
-		raise ExitError('badarg')
-	return ThreadProcess(func, args, kwargs)
+	return _doSpawn(func, args, kwargs, None)
 
 
 def spawnLink(func, *args, **kwargs):
 	"""spawn and link to a new process atomically"""
+	return _doSpawn(func, args, kwargs, self())
+
+
+def _doSpawn(func, args, kwargs, initialLink):
+	"""performs initiation of new process thread"""
 	_checkSignal()
 	if not callable(func):
 		raise ExitError('badarg')
-	return ThreadProcess(func, args, kwargs, self())
+	class_ = Process
+	if '_processClass' in kwargs:
+		class_ = kwargs['_processClass']
+		del kwargs['_processClass']
+	proc = class_()
+	proc._startThread(func, args, kwargs, initialLink)
+	return proc
 
 
 def self(noCheck=False):
@@ -151,5 +159,4 @@ class ExitError(Exception):
 
 
 # We can't import these at the top, since the process module imports this one
-from candygram.process import Process, ThreadProcess, getProcessMap, \
-		getProcessMapLock
+from candygram.process import Process, getProcessMap, getProcessMapLock

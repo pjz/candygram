@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.12 2004/09/08 22:07:53 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.13 2004/09/09 15:47:07 hobb0001 Exp $'
 
 
 import atexit
@@ -34,7 +34,7 @@ from candygram.condition import Condition
 
 class Process:
 
-	"""Abstract Process class"""
+	"""A Candygram Process thread"""
 
 	def __init__(self):
 		self.__alive = True
@@ -47,6 +47,12 @@ class Process:
 		self.__signalLock = allocateLock()
 		self.__links = {}
 		self.__linksLock = allocateLock()
+
+	def _startThread(self, func, args, kwargs, initialLink):
+		if initialLink is not None:
+			self._addLink(initialLink)
+			initialLink._addLink(self)
+		startThread(self.__run, (func, args, kwargs))
 
 	def isAlive(self):
 		"""Return True if process is still running"""
@@ -201,22 +207,7 @@ class Process:
 			raise reason.excInfo[0], reason.excInfo[1], reason.excInfo[2]
 		raise signal
 
-
-class ThreadProcess(Process):
-
-	"""A process that is running on a thread"""
-
-	def __init__(self, func, args, kwargs, initialLink=None):
-		Process.__init__(self)
-		self.__func = func
-		self.__args = args
-		self.__kwargs = kwargs
-		if initialLink is not None:
-			self._addLink(initialLink)
-			initialLink._addLink(self)
-		startThread(self.__run, ())
-
-	def __run(self):
+	def __run(self, func, args, kwargs):
 		"""main function of thread"""
 		currentThread = getCurrentThread()
 		getProcessMapLock().acquire()
@@ -224,7 +215,7 @@ class ThreadProcess(Process):
 		getProcessMapLock().release()
 		exitError = ExitError('normal', self)
 		try:
-			self.__func(*self.__args, **self.__kwargs)
+			func(*args, **kwargs)
 		except ExitError, ex:
 			exitError = ex
 		except:
@@ -242,6 +233,9 @@ class RootProcess(Process):
 	def __init__(self):
 		Process.__init__(self)
 		atexit.register(self.__atexit)
+
+	def _startThread(func, args, kwargs, initialLink=None):
+		raise NotImplementedError('RootProcess does not run on a thread')
 
 	def __atexit(self):
 		"""invoked when interpreter is exiting"""

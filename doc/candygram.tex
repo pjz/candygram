@@ -229,12 +229,16 @@ or
 % ----------------------------------------------------------------------------
 \subsection{Functions}
 
-\begin{funcdesc}{spawn}{func\optional{, args\moreargs}}
+\begin{funcdesc}{spawn}{func\optional{, args\moreargs}\optional{, _processClass=Process}}
 Create a new concurrent process by calling the function \var{func} with the
 \var{args} argument list and return the resulting \class{Process} instance.
 When the function \var{func} returns, the process terminates. Raises a
 \code{'badarg'} \exception{ExitError} if \var{func} is not
 \function{callable()}.
+
+If you define a subclass of \class{Process}, you can instruct the
+\function{spawn()} function to create an instance of that class by passing in
+the class with the optional \var{_processClass} keyword argument.
 \end{funcdesc}
 
 \begin{funcdesc}{link}{proc}
@@ -256,7 +260,7 @@ Refer to the \function{processFlag()} function for details about handling
 signals.
 \end{funcdesc}
 
-\begin{funcdesc}{spawnLink}{func\optional{, args\moreargs}}
+\begin{funcdesc}{spawnLink}{func\optional{, args\moreargs}\optional{, _processClass=Process}}
 This function is identical to the following code being evaluated in an atomic
 operation:
 \begin{verbatim}
@@ -267,6 +271,10 @@ This function is necessary since the process created might run immediately and
 fail before \function{link()} is called. Returns the \class{Process} instance of
 the newly created process. Raises a \code{'badarg'} \exception{ExitError} if
 \var{func} is not \function{callable()}.
+
+If you define a subclass of \class{Process}, you can instruct the
+\function{spawnLink()} function to create an instance of that class by passing
+in the class with the optional \var{_processClass} keyword argument.
 \end{funcdesc}
 
 \begin{funcdesc}{unlink}{proc}
