@@ -20,15 +20,10 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: __init__.py,v 1.3 2004/08/18 20:57:47 hobb0001 Exp $'
+__revision__ = '$Id: __init__.py,v 1.4 2004/08/18 21:23:56 hobb0001 Exp $'
 
 from candygram import spawn, spawnLink, self, self_, exit, link, unlink, \
 		processFlag, processes, isProcessAlive, send, ExitError
 from process import Process
 from receiver import Receiver, Message
 from pattern import Any, AnyRemaining
-
-# Even though the framework is present for multiple threading models, we only
-# support the default right now.
-import thread_impl
-thread_impl.setImplementation(thread_impl.DEFAULT)

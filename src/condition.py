@@ -36,10 +36,13 @@ simplified by making the following assumptions:
    the lock.
 """
 
+__revision__ = '$Id: condition.py,v 1.2 2004/08/18 21:23:56 hobb0001 Exp $'
+
 import thread_impl
 import time
 
 class Condition:
+	"""modified Condition class"""
 	def __init__(self):
 		self.__lock = thread_impl.allocateLock()
 		self.acquire = self.__lock.acquire
@@ -48,6 +51,7 @@ class Condition:
 		self.__waiter = None
 
 	def wait(self, timeout=None):
+		"""wait for notify()"""
 		assert self.locked()
 		waiter = thread_impl.allocateLock()
 		waiter.acquire()
@@ -60,6 +64,7 @@ class Condition:
 		pass
 
 	def notify(self):
+		"""wake up wait()ers"""
 		assert self.locked()
 		if self.__waiter is not None:
 			self.__waiter.release()
@@ -67,6 +72,7 @@ class Condition:
 		pass
 
 def _acquire(lock, timeout):
+	"""try to acquire a lock, with a timeout"""
 	if timeout is None:
 		lock.acquire()
 		return True

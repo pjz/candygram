@@ -18,25 +18,14 @@
 # along with Candygram; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""Provides threading primitives"""
+"""provides threading primitives"""
 
-__revision__ = '$Id: thread_impl.py,v 1.3 2004/08/18 20:57:50 hobb0001 Exp $'
+__revision__ = '$Id: thread_impl.py,v 1.4 2004/08/18 21:23:56 hobb0001 Exp $'
 
-DEFAULT = 0
+import thread
 
-getCurrentThread = None
-startThread = None
-allocateLock = None
-
-def setImplementation(implType):
-	"""Specify which threading implementation to use"""
-	global getCurrentThread, startThread, allocateLock
-	if implType == DEFAULT:
-		import thread
-		getCurrentThread = thread.get_ident
-		startThread = thread.start_new_thread
-		allocateLock = thread.allocate_lock
-		return
-	assert False, 'Unknown implType: %d' % implType
-
-
+# If we ever use a different implementation (like, say, stackless) use an
+# environment variable to specify which implementation, a la pychecker.
+getCurrentThread = thread.get_ident
+startThread = thread.start_new_thread
+allocateLock = thread.allocate_lock

@@ -27,7 +27,7 @@ evaluation='10.0 - ((float(5 * errors + warnings) / statements) * 10)'
 
 # Add a comment according to your evaluation note. This is used by the global
 # evaluation report (R0004).
-comment=no
+comment=yes
 
 # Include message's id in output
 include-ids=yes
@@ -82,16 +82,16 @@ module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 class-rgx=[A-Z][a-zA-Z0-9]+$
 
 # Regular expression which should only match correct function names
-function-rgx=[a-z][a-zA-Z0-9]*$
+function-rgx=_?[a-z][a-zA-Z0-9]*$
 
 # Regular expression which should only match correct method names
-method-rgx=[a-z_][a-zA-Z0-9]*$
+method-rgx=_{0,2}[a-z][a-zA-Z0-9]*_{0,2}$
 
 # Regular expression which should only match correct argument names
-argument-rgx=[a-z_][a-zA-Z0-9]*$
+argument-rgx=[a-z][a-zA-Z0-9]*$
 
 # Regular expression which should only match correct variable names
-variable-rgx=[a-z_][a-zA-Z0-9]*$
+variable-rgx=[a-z][a-zA-Z0-9]*$
 
 # Good variable names which should always be accepted, separated by a comma
 good-names=i,j,k,ex,Run

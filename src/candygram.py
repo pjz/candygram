@@ -18,28 +18,32 @@
 # along with Candygram; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""Erlang concurrency primitives"""
+
+__revision__ = '$Id: candygram.py,v 1.3 2004/08/18 21:23:56 hobb0001 Exp $'
+
 import thread_impl
-import types
 
 
 def spawn(func, *args, **kwargs):
+	"""spawn new process"""
 	_checkSignal()
-	t = type(func)
-	if not callable(t):
+	if not callable(func):
 		raise ExitError('badarg')
 	return _ThreadProcess(func, args, kwargs)
 
 def spawnLink(func, *args, **kwargs):
+	"""spawn and link to a new process atomically"""
 	_checkSignal()
-	t = type(func)
-	if not callable(t):
+	if not callable(func):
 		raise ExitError('badarg')
 	return _ThreadProcess(func, args, kwargs, self())
 
-def self(__noCheck=False):
+def self(noCheck=False):
+	"""return current process"""
 	# _checkSignal() needs to invoke self(). In order to avoid infinite recursion,
-	# don't call _checkSignal() if __noCheck is set.
-	if not __noCheck:
+	# don't call _checkSignal() if noCheck is set.
+	if not noCheck:
 		_checkSignal()
 	ProcessMapLock().acquire()
 	try:
@@ -56,6 +60,7 @@ def self(__noCheck=False):
 self_ = self
 
 def exit(*args):
+	"""kill a process"""
 	_checkSignal()
 	numArgs = len(args)
 	if numArgs == 0 or numArgs > 2:
@@ -68,6 +73,7 @@ def exit(*args):
 	return True
 
 def link(proc):
+	"""link to a process"""
 	_checkSignal()
 	if not isinstance(proc, Process):
 		raise ExitError('badarg')
@@ -79,6 +85,7 @@ def link(proc):
 	return True
 
 def unlink(proc):
+	"""remove link to a process"""
 	_checkSignal()
 	if not isinstance(proc, Process):
 		raise ExitError('badarg')
@@ -88,9 +95,11 @@ def unlink(proc):
 	return True
 
 def processFlag(flag, value):
+	"""set a process flag"""
 	return self()._processFlag(flag, value)
 
 def processes():
+	"""list all active processes"""
 	_checkSignal()
 	ProcessMapLock().acquire()
 	try:
@@ -100,11 +109,13 @@ def processes():
 	pass
 
 def isProcessAlive(proc):
+	"""return True if process is active"""
 	if not isinstance(proc, Process):
 		raise ExitError('badarg')
 	return proc.isAlive()
 
 def send(proc, msg):
+	"""send a message to process"""
 	if not isinstance(proc, Process):
 		raise ExitError('badarg')
 	return proc.send(msg)
@@ -112,6 +123,7 @@ def send(proc, msg):
 
 
 class ExitError(Exception):
+	"""raised by EXIT signals"""
 	def __init__(self, reason, proc=None):
 		Exception.__init__(self, reason)
 		self.reason = reason
@@ -124,6 +136,7 @@ class ExitError(Exception):
 
 
 def _checkSignal():
+	"""check if a signal has been sent to current process"""
 	self(True)._checkSignal()
 
 
