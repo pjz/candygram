@@ -1,1 +1,7 @@
-/usr/src/python-2.3.4-2/Doc/tools/mkhowto --about about.dat --split 4 $* candygram.tex
+#!/bin/sh
+if [ "$1" = "sourceforge" ]; then
+	address=`cat sflogo.html`
+	shift
+fi
+
+/usr/src/python-2.3.4-2/Doc/tools/mkhowto --about about.dat --split 4 --address "$address" $* candygram.tex

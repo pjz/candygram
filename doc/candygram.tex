@@ -37,7 +37,7 @@ under the terms of the GNU Free Documentation License, Version 1.2
 or any later version published by the Free Software Foundation;
 with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
 A copy of the license is included in the section entitled ``GNU
-Free Documentation License''. [\ref{fdl}]
+Free Documentation License''.
 
 \begin{abstract}
 \noindent
@@ -49,19 +49,25 @@ developers to send and receive messages between threads using semantics nearly
 identical to those in the Erlang language.
 \end{abstract}
 
-% A table of contents is redundant when generating with latex2html.
-\ifpdf
-	\tableofcontents
-\fi
+\tableofcontents
 
 
 
 % ############################################################################
-\section{Download}
+\section{Download And Install}
 
-\ulink{Download}{http://sourceforge.net/project/showfiles.php?group_id=114295}
+All available versions of Candygram can be \ulink{downloaded here}
+	{http://sourceforge.net/project/showfiles.php?group_id=114295} on
+SourceForge.net. The current stable release, as of this writing, is \version.
+This documentation can also be downloaded in PDF format from the link above.
 
-Documentation is also available in PDF.
+To install, uncompress the zip or tar file, \program{cd} into the directory, and
+run:
+\begin{verbatim}
+python setup.py install
+\end{verbatim}
+
+Windows users can just download the installer program and run it.
 
 
 
@@ -394,9 +400,9 @@ If any of the \var{args} parameters is \constant{candygram.Message}, then when
 \var{func} is invoked, that parameter is replaced with the message that matched
 the pattern.
 
-Note that the handler functions are not invoked until the \method{receive()}
+\note{The handler functions are not invoked until the \method{receive()}
 method is called. Refer to the \method{receive()} documentation for details
-about the mechanism by which handlers are invoked.
+about the mechanism by which handlers are invoked.}
 \end{methoddesc}
 
 \begin{methoddesc}{__setitem__}{pattern, funcWithArgs}
@@ -571,23 +577,23 @@ The process that originally caused the \exception{ExitError}.
 
 % ############################################################################
 \section{Examples}
-There should be a directory named ``examples'' somewhere within your
+There should be a directory named \file{examples} somewhere within your
 distribution of Candygram. This directory contains the Candygram equivalents of
 all the sample programs found in chapter 5 and sections 7.2, 7.3, and 7.5 of
-\erlangbook. The files named ``program_X.X.py'' are direct translations of the
-Erlang programs. The files named ``program_X.X_alt.py'' are alternate, more
-liberal translations that use more Pythonic idioms. Note that since the CPython
-interpreter does not perform tail-call optimization, the tail-recursive style of
-the direct translations is not a recommended practice.
+\erlangbook. The files named \file{program_X.X.py} are direct translations of
+the Erlang programs. The files named \file{program_X.X_alt.py} are alternate,
+more liberal translations that use more Pythonic idioms. \note{Since the
+CPython interpreter does not perform tail-call optimization, the tail-recursive
+style of the direct translations is not a recommended practice.}
 
-The examples directory also contains a few other modules that demonstrate how
-Candygram can be used to perform some handy functions.
+The \file{examples} directory also contains a few other modules that demonstrate
+how Candygram can be used to perform some handy functions.
 
 For those who are not already familiar with Erlang, the best way to become
 familiar with Candygram is to read chapter 5 in \erlangbook\ and follow along
-using the example programs located in the examples directory. For those who are
-already familiar with Erlang, here are a few code snippits to give you a taste
-of Candygram.
+using the example programs located in the \file{examples} directory. For those
+who are already familiar with Erlang, here are a few code snippits to give you a
+taste of Candygram.
 
 \begin{verbatim}
 >>> from candygram import *
@@ -688,7 +694,13 @@ wrong; the name Candygram is correctly pronounced ``throat warbler mangrove.''
 % ############################################################################
 \section{Feedback}
 
-Please submit bugs here
+Please submit all bug reports, feature requests, etc. to the appropriate tracker
+on \ulink{SourceForge.net}{http://sourceforge.net/tracker/?group_id=114295}.
+
+General discussion takes place on the
+\email{candygram-discuss@lists.sourceforge.net} mailing list. You can subscribe
+to this list by visiting \ulink{this page}
+	{http://lists.sourceforge.net/lists/listinfo/candygram-discuss}.
 
 
 
