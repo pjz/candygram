@@ -12,17 +12,17 @@ class TestDocExample(unittest.TestCase):
 
 	def setUp(self):
 		self.out = StringIO.StringIO()
-		
+
 	def tearDown(self):
 		self.out.close()
-	
+
 	def test1(self):
 		def proc_func():
 			r = Receiver()
 			r['land shark'] = lambda m: 'Go Away ' + m, Message
 			r['candygram'] = lambda m: 'Hello ' + m, Message
 			for message in r:
-				print >> self.out, message		
+				print >> self.out, message
 		proc = spawn(proc_func)
 		proc | 'land shark'
 		proc | 'candygram'
@@ -30,10 +30,10 @@ class TestDocExample(unittest.TestCase):
 		time.sleep(1)
 		exit(proc, 'kill')
 		# Assert print statements worked as advertised
-		self.assertEqual(self.out.getvalue(), 
+		self.assertEqual(self.out.getvalue(),
 				'Go Away land shark\n' \
 				'Hello candygram\n')
-	
+
 	def test2(self):
 		import candygram as cg
 		def proc_func():
@@ -41,11 +41,11 @@ class TestDocExample(unittest.TestCase):
 			r.addHandler('land shark', shut_door, cg.Message)
 			r.addHandler('candygram', open_door, cg.Message)
 			for message in r:
-				print >> self.out, message		
+				print >> self.out, message
 		def shut_door(name):
 			return 'Go Away ' + name
 		def open_door(name):
-			return 'Hello ' + name		
+			return 'Hello ' + name
 		proc = cg.spawn(proc_func)
 		proc.send('land shark')
 		proc.send('candygram')
@@ -53,7 +53,7 @@ class TestDocExample(unittest.TestCase):
 		time.sleep(1)
 		cg.exit(proc, 'kill')
 		# Assert print statements worked as advertised
-		self.assertEqual(self.out.getvalue(), 
+		self.assertEqual(self.out.getvalue(),
 				'Go Away land shark\n' \
 				'Hello candygram\n')
 
@@ -83,6 +83,6 @@ class TestDocExample(unittest.TestCase):
 		exit(a, 'kill')
 		exit(b, 'kill')
 		# Assert print statements worked as advertised
-		self.assertEqual(self.out.getvalue(), 
+		self.assertEqual(self.out.getvalue(),
 				'A received: Girl Scout cookies\n' \
 				'A received: The meaning of life is: 42\n')

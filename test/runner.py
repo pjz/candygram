@@ -13,9 +13,9 @@ def loadCandygram(pwd):
 	sys.path.insert(0, parent)
 	# Import src and then rename it to 'candygram' in sys.modules
 	#
-	# Importing src causes src/__init__.py to import a bunch of candygram.* 
-	# modules before we are able to redefine the candygram package. We therefore 
-	# need to remove these modules, redefine src as candygram, and then reload 
+	# Importing src causes src/__init__.py to import a bunch of candygram.*
+	# modules before we are able to redefine the candygram package. We therefore
+	# need to remove these modules, redefine src as candygram, and then reload
 	# src.
 	import src
 	for module in sys.modules.keys():
@@ -40,10 +40,12 @@ def main():
 	# Run all of each module's test cases.
 	for test in tests:
 		suite = unittest.defaultTestLoader.loadTestsFromName(test)
-		unittest.TextTestRunner(verbosity=2).run(suite)
+		result = unittest.TextTestRunner(verbosity=2).run(suite)
+		if not result.wasSuccessful():
+			break
+		# end if
 	# end for
-	
-	
+
+
 if __name__ == '__main__':
 	main()
-	
