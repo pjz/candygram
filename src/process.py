@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.14 2004/09/10 20:28:20 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.15 2004/09/10 21:12:46 hobb0001 Exp $'
 
 
 import atexit
@@ -34,7 +34,7 @@ from candygram.condition import Condition
 
 class Process:
 
-	"""A Candygram Process thread"""
+	"""A Candygram Process"""
 
 	def __init__(self):
 		self.__alive = True
@@ -49,6 +49,7 @@ class Process:
 		self.__linksLock = allocateLock()
 
 	def _startThread(self, func, args, kwargs, initialLink):
+		"""Start process running on new thread"""
 		if initialLink is not None:
 			self._addLink(initialLink)
 			initialLink._addLink(self)
@@ -238,9 +239,11 @@ class RootProcess(Process):
 		atexit.register(self.__atexit)
 
 	def _startThread(func, args, kwargs, initialLink=None):
+		"""Start process running on new thread"""
 		raise NotImplementedError('RootProcess does not run on a thread')
 
 	def __excepthook(self, type, value, traceback):
+		"""invoked when unhandled exception is raised"""
 		self.__exceptionRaised = True
 		return self.__origExcepthook(type, value, traceback)
 
