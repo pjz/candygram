@@ -18,7 +18,12 @@
 # along with Candygram; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from candygram import *
+"""Erlang concurrency primitives"""
+
+__revision__ = '$Id: __init__.py,v 1.3 2004/08/18 20:57:47 hobb0001 Exp $'
+
+from candygram import spawn, spawnLink, self, self_, exit, link, unlink, \
+		processFlag, processes, isProcessAlive, send, ExitError
 from process import Process
 from receiver import Receiver, Message
 from pattern import Any, AnyRemaining
