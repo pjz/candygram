@@ -1,7 +1,11 @@
-from candygram import *
+"""Tests that all examples in documentation work as advertised"""
+
+
 import unittest
 import time
 import StringIO
+
+from candygram import *
 
 
 class TestDocExample(unittest.TestCase):

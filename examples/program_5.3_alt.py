@@ -6,7 +6,7 @@
 from candygram import *
 
 
-def s():
+def s1():
 	s1 = Receiver()
 	s2 = Receiver()
 	s3 = Receiver()

@@ -1,5 +1,9 @@
-import candygram as cg
+"""Tests that patterns in documentation work as advertised"""
+
+
 import unittest
+
+import candygram as cg
 
 
 class TestPatterns(unittest.TestCase):

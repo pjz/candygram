@@ -1,3 +1,6 @@
+"""Executes all tests located in this directory"""
+
+
 import sys
 import os
 import glob
