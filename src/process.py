@@ -20,11 +20,12 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.9 2004/08/24 17:09:27 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.10 2004/08/24 18:38:29 hobb0001 Exp $'
 
 
 import atexit
 import sys
+import weakref
 
 from candygram.main import ExitError, _checkSignal
 from candygram.threadimpl import allocateLock, startThread, getCurrentThread
@@ -39,8 +40,8 @@ class Process:
 		self.__alive = True
 		self._mailbox = []
 		self._mailboxCondition = Condition()
-		self._receiverRefs = []
-		self._receiverRefsLock = allocateLock()
+		self.__receiverRefs = []
+		self.__receiverRefsLock = allocateLock()
 		self.__signal = None
 		self.__signalSet = False
 		self.__trapExit = False
@@ -112,6 +113,31 @@ class Process:
 		if procId in self.__links:
 			del self.__links[procId]
 		self.__linksLock.release()
+
+	def _addReceiver(self, receiver):
+		"""register a new receiver with this process"""
+		self.__receiverRefsLock.acquire()
+		# We don't want the __receiverRefs list to prevent garbage collection of
+		# the receiver.
+		self.__receiverRefs.append(weakref.ref(receiver, self._removeReceiver))
+		self.__receiverRefsLock.release()
+
+	def _removeReceiver(self, ref):
+		"""called when no more [strong] references to a registered receiver"""
+		self.__receiverRefsLock.acquire()
+		self.__receiverRefs.remove(ref)
+		self.__receiverRefsLock.release()
+
+	def _getReceivers(self):
+		"""return list of registered receivers"""
+		def deref(ref):
+			receiver = ref()
+			assert receiver is not None # _removeReceiver() shouldn't leave any strays
+			return receiver
+		self.__receiverRefsLock.acquire()
+		result = [deref(ref) for ref in self.__receiverRefs]
+		self.__receiverRefsLock.release()
+		return result
 
 	def _exit(self, exitError):
 		"""signal that process has terminated"""

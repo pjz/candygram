@@ -1,5 +1,6 @@
 include COPYING
 recursive-include examples *.py
+recursive-include test *.py
 
 include doc/candygram/*
 include doc/*.tex

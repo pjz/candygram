@@ -20,11 +20,10 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.7 2004/08/20 17:30:25 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.8 2004/08/24 18:38:29 hobb0001 Exp $'
 
 
 import time
-import weakref
 
 from candygram.main import _checkSignal, self_, ExitError
 from candygram.pattern import genFilter
@@ -50,22 +49,7 @@ class Receiver:
 		self.__timeoutHandler = None
 		self.__timeoutArgs = None
 		self.__timeoutKWArgs = None
-		self.__receiverRefs = self.__owner._receiverRefs
-		self.__receiverRefsLock = self.__owner._receiverRefsLock
-		self.__receiverRefsLock.acquire()
-		self.__receiverRefs.append(weakref.ref(self, self.__finalizeRef))
-		self.__receiverRefsLock.release()
-
-	def __finalizeRef(self, ref):
-		"""called when no more [strong] references to self"""
-		assert ref is self
-		self.__receiverRefsLock.acquire()
-		for i in range(len(self.__receiverRefs)):
-			if self.__receiverRefs[i]() is ref:
-				del self.__receiverRefs[i]
-				break
-			# end if
-		self.__receiverRefsLock.release()
+		self.__owner._addReceiver(self)
 
 	def addHandler(self, pattern, handler=None, *args, **kwargs):
 		"""add pattern handler to receiver"""
@@ -180,15 +164,13 @@ class Receiver:
 	def __deleteMessage(self, i):
 		"""remove i'th message from mailbox, notifying any other receivers"""
 		assert self.__mailboxCondition.locked()
-		self.__receiverRefsLock.acquire()
+		receivers = self.__owner._getReceivers()
 		del self.__mailbox[i]
-		for ref in self.__receiverRefs:
-			receiver = ref()
-			assert receiver is not None  # __finalizeRef() should not leave any strays
+		for receiver in receivers:
 			if receiver.__lastMessage > i:
 				receiver.__lastMessage -= 1
 			# end if
-		self.__receiverRefsLock.release()
+		# end for
 
 	def __wait(self, expire):
 		"""wait expire milliseconds for a new message"""
