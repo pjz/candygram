@@ -74,6 +74,7 @@ Windows users can just download the installer program and run it.
 
 % ############################################################################
 \section{Overview}
+\label{overview}
 
 \begin{notice}[note]
 Erlang uses a peculiar terminology in respect to threads. In Erlang parlance,
@@ -406,12 +407,6 @@ and invokes the callback function that is associated with the first matching
 pattern. Refer to section \ref{patterns} for details about how to specify
 message patterns.
 
-\begin{notice}[warning]
-You may not call \method{Receiver.receive()} from any process other than the
-one that created the \class{Receiver} instance. You should take care, therefore,
-to create a \class{Receiver} within the process that will be using it.
-\end{notice}
-
 \begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, args\moreargs}}}
 Register a handler function \var{func} for the \var{pattern}. The
 \method{receive()} method calls the \var{func} with the \var{args} argument
@@ -467,9 +462,9 @@ example:
 Register all handler functions in \var{receiver} with this \class{Receiver}
 object. This method adds all of the patterns and handler functions that have
 been added to the given \var{receiver} to this receiver, in the same order. You
-can use this method to make copies of \class{Receiver} objects. You may use a
-\var{receiver} that was created in a different process. Raises a \code{'badarg'}
-\exception{ExitError} if \var{receiver} is not a \class{Receiver} instance.
+can use this method to make copies of \class{Receiver} objects. Raises a
+\code{'badarg'} \exception{ExitError} if \var{receiver} is not a
+\class{Receiver} instance.
 \end{methoddesc}
 
 \begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
@@ -716,6 +711,25 @@ This question produces an outrageous amount of heated debate. Some claim that
 you pronounce it with short A's, as in tomato, while others claim that you
 pronounce it with long A's, as in potato. Both sides, however, are completely
 wrong; the correct pronunciation for Candygram is ``throat warbler mangrove.''
+
+\subsection{Underneath it all, does the \function{spawn()} function create a
+process, a thread, or a microthread?}
+The short answer is that it creates a thread. In Erlang, the \function{spawn()}
+function creates a microthread but calls it a ``process''. Since Python does not
+yet support microthreads, the Candygram \function{spawn()} function creates a
+standard thread and calls it a ``process''. Despite the terminology, no new
+operating system processes are ever created. Refer to the overview (section
+\ref{overview}) for further explanation.
+
+Candygram 1.1 will include support for some form of microthreads.
+
+\subsection{How many processes can I \function{spawn()}?}
+Since Candygram's \function{spawn()} function creates a new thread, it depends
+on how many threads your operating system can reliably handle. Most operating
+systems can comfortably handle a few dozen threads.
+
+Future versions of Candygram will support microthreads, which will allow you to
+spawn thousands of processes.
 
 
 
