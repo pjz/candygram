@@ -45,24 +45,24 @@ def demo1():
 def demonstrate_normal():
 	def func():
 		link(demo_)
-	spawn(func)
+	return spawn(func)
 
 
 def demonstrate_exit(what):
 	def func():
 		link(demo_)
 		exit(what)
-	spawn(func)
+	return spawn(func)
 
 
 def demonstrate_message(what):
 	def func():
 		demo_ | what
-	spawn(func)
+	return spawn(func)
 
 
 def demonstrate_error():
 	def func():
 		link(demo_)
 		1 / 0
-	spawn(func)
+	return spawn(func)

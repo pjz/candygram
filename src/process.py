@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.8 2004/08/24 16:41:41 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.9 2004/08/24 17:09:27 hobb0001 Exp $'
 
 
 import atexit
@@ -219,6 +219,9 @@ class ExceptionReason:
 
 	def __init__(self):
 		self.excInfo = sys.exc_info()
+
+	def __str__(self):
+		return '<exception: %s>' % self.excInfo[1]
 
 
 # These values are singletons that are accessed only via getProcessMap*()

@@ -174,3 +174,47 @@ class TestExamplePrograms(unittest.TestCase):
 			self.assertRaises(cg.ExitError, proc.isAlive)
 		test(self.execFile('program_7.2.py'))
 		test(self.execFile('program_7.2_alt.py'))
+
+	def testProgram_7_3(self):
+		def test(dict):
+			proc = dict['start']()
+			normal = dict['demonstrate_normal']()
+			time.sleep(PAUSE)
+			self.assert_(not normal.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo process received normal exit from %s\n' % normal)
+			self.resetStdout()
+			hello = dict['demonstrate_exit']('hello')
+			time.sleep(PAUSE)
+			self.assert_(not hello.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo process received exit signal hello from %s\n' % hello)
+			self.resetStdout()
+			normal = dict['demonstrate_exit']('normal')
+			time.sleep(PAUSE)
+			self.assert_(not normal.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo process received normal exit from %s\n' % normal)
+			self.resetStdout()
+			error = dict['demonstrate_error']()
+			time.sleep(PAUSE)
+			self.assert_(not error.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo process received exit signal ' \
+					'<exception: integer division or modulo by zero> from %s\n' % error)
+			self.resetStdout()
+			message = dict['demonstrate_message']('hello')
+			time.sleep(PAUSE)
+			self.assert_(not message.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo process message hello\n')
+			self.resetStdout()
+			finished = dict['demonstrate_message']('finished_demo')
+			time.sleep(PAUSE)
+			self.assert_(not finished.isAlive())
+			self.assertEqual(sys.stdout.getvalue(),
+					'Demo finished \n')
+			self.assert_(not proc.isAlive())
+			self.resetStdout()
+		test(self.execFile('program_7.3.py'))
+		test(self.execFile('program_7.3_alt.py'))
