@@ -20,9 +20,9 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: candygram.py,v 1.4 2004/08/18 22:10:24 hobb0001 Exp $'
+__revision__ = '$Id: main.py,v 1.1 2004/08/19 22:10:47 hobb0001 Exp $'
 
-import thread_impl
+from candygram import thread_impl
 
 
 def spawn(func, *args, **kwargs):
@@ -142,4 +142,5 @@ def _checkSignal():
 
 
 # We can't import these at the top, since the process module imports this one
-from process import Process, ThreadProcess, getProcessMap, getProcessMapLock
+from candygram.process import Process, ThreadProcess, getProcessMap, \
+                              getProcessMapLock
