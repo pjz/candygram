@@ -2,8 +2,6 @@
 
 
 import unittest
-import sys
-import StringIO
 
 import candygram as cg
 
