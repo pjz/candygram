@@ -20,27 +20,27 @@
 
 """Pattern filter generator"""
 
-__revision__ = '$Id: pattern.py,v 1.3 2004/08/18 22:10:24 hobb0001 Exp $'
+__revision__ = '$Id: pattern.py,v 1.4 2004/08/19 23:13:41 hobb0001 Exp $'
+
 
 import types
 
 
-
+# Generate a unique values for 'Any' and 'AnyRemaining' so that they won't ever
+# be confused with any other value.
 Any = object()
 AnyRemaining = object()
 
 
 def genFilter(pattern):
 	"""generate a pattern filter"""
-	t = type(pattern)
-	if t is types.TupleType or t is types.ListType:
+	if isinstance(pattern, tuple) or isinstance(pattern, list):
 		result = genSeqFilter(pattern, t)
-	elif t is types.DictType:
+	elif isinstance(pattern, dict):
 		result = genDictFilter(pattern)
-	elif t is types.TypeType or t is types.ClassType:
+	elif isinstance(pattern, type) or type(pattern) is types.ClassType:
 		result = genTypeFilter(pattern)
-	elif t is types.FunctionType or t is types.MethodType or \
-			t is types.BuiltinFunctionType:
+	elif callable(pattern):
 		result = genFuncFilter(pattern)
 	elif pattern is Any:
 		result = genAnyFilter(pattern)
@@ -48,28 +48,33 @@ def genFilter(pattern):
 		result = genValueFilter(pattern)
 	return result
 
+
 def genAnyFilter(unused):
 	"""gen filter for Any"""
 	return lambda x: True
+
 
 def genValueFilter(value):
 	"""gen filter for a specific value"""
 	return lambda x: x == value
 
+
 def genFuncFilter(func):
 	"""gen filter for a function"""
 	return func
 
+
 def genTypeFilter(t):
 	"""gen filter for a type check"""
 	return lambda x: isinstance(x, t)
+
 
 def genSeqFilter(seq, seqType):
 	"""gen filter for a sequence pattern"""
 	# Define these values as constants outside of the filt() function so that
 	# the filter will not have to re-calculate the values every time it's called.
 	anyRemaining = False
-	if len(seq) > 0 and seq[-1] is AnyRemaining:
+	if seq and seq[-1] is AnyRemaining:
 		anyRemaining = True
 		seq = seq[:-1]
 	seqLen = len(seq)
@@ -77,7 +82,7 @@ def genSeqFilter(seq, seqType):
 	seqRange = range(seqLen)
 	def filt(x):
 		"""resulting filter function"""
-		if type(x) is not seqType:
+		if not isinstance(x, seqType):
 			return False
 		if anyRemaining and len(x) < seqLen:
 			return False
@@ -86,9 +91,10 @@ def genSeqFilter(seq, seqType):
 		for i in seqRange:
 			if not subFilters[i](x[i]):
 				return False
-			pass
+			# end if
 		return True
 	return filt
+
 
 def genDictFilter(dict_):
 	"""gen filter for a dictionary pattern"""
@@ -102,6 +108,6 @@ def genDictFilter(dict_):
 				return False
 			if not subFilter(x[key]):
 				return False
-			pass
+			# end if
 		return True
 	return filt
