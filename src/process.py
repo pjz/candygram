@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.10 2004/08/24 18:38:29 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.11 2004/08/24 21:05:23 hobb0001 Exp $'
 
 
 import atexit
@@ -131,6 +131,7 @@ class Process:
 	def _getReceivers(self):
 		"""return list of registered receivers"""
 		def deref(ref):
+			"""dereference a weakref"""
 			receiver = ref()
 			assert receiver is not None # _removeReceiver() shouldn't leave any strays
 			return receiver
