@@ -631,6 +631,13 @@ Go Away land shark
 Hello candygram
 \end{verbatim}
 
+\begin{notice}[note]
+If this code is run as a script, the Python interpreter will exit after the last
+line is evaluated, killing any spawned processes. That is why the last line is
+a call to the \function{sleep()} function, so that the spawned process has an
+opportunity to print its message before the interpreter exits and kills it.
+\end{notice}
+
 The code above uses a rather Erlangy syntax. Here is a more Pythonic version
 that does the same:
 \begin{verbatim}
@@ -721,14 +728,12 @@ standard thread and calls it a ``process''. Despite the terminology, no new
 operating system processes are ever created. Refer to the overview (section
 \ref{overview}) for further explanation.
 
-Candygram 1.1 will include support for some form of microthreads.
-
 \subsection{How many processes can I \function{spawn()}?}
 Since Candygram's \function{spawn()} function creates a new thread, it depends
 on how many threads your operating system can reliably handle. Most operating
-systems can comfortably handle a few dozen threads.
+systems can comfortably handle several dozen threads.
 
-Future versions of Candygram will support microthreads, which will allow you to
+Future versions of Candygram may support microthreads, which would allow you to
 spawn thousands of processes.
 
 
