@@ -20,7 +20,7 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.9 2004/08/31 23:15:34 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.10 2004/09/08 22:07:53 hobb0001 Exp $'
 
 
 import time
@@ -41,18 +41,17 @@ class Receiver:
 
 	def __init__(self):
 		_checkSignal()
-		# Lock for __handlers, __lastMessage, and __timeout* attributes.
+		# Lock for __handlers, __lastMessage,  and __timeout* attributes.
 		self.__lock = allocateLock()
 		self.__handlers = []
 		self.__lastMessage = 0
-		self.__owner = self_()
-		self.__mailbox = self.__owner._mailbox
-		self.__mailboxCondition = self.__owner._mailboxCondition
+		self.__currentProcess = None
+		self.__mailbox = None
+		self.__mailboxCondition = None
 		self.__timeout = None
 		self.__timeoutHandler = None
 		self.__timeoutArgs = None
 		self.__timeoutKWArgs = None
-		self.__owner._addReceiver(self)
 
 	def addHandler(self, pattern, handler=None, *args, **kwargs):
 		"""add pattern handler to receiver"""
@@ -99,7 +98,7 @@ class Receiver:
 	def receive(self, timeout=None, handler=None, *args, **kwargs):
 		"""retrieve one message from mailbox"""
 		_checkSignal()
-		self.__checkOwner()
+		self.__checkCurrentProcess()
 		if timeout is not None:
 			self.__setAfter(timeout, handler, args, kwargs)
 		expire = None
@@ -167,6 +166,7 @@ class Receiver:
 	def __scanMailbox(self):
 		"""see if any message in mailbox matches a registered pattern"""
 		assert self.__mailboxCondition.locked()
+		# Prevent anyone from adding a new handler while we're scanning the mailbox:
 		self.__lock.acquire()
 		try:
 			for i in xrange(self.__lastMessage, len(self.__mailbox)):
@@ -185,10 +185,12 @@ class Receiver:
 	def __deleteMessage(self, i):
 		"""remove i'th message from mailbox, notifying any other receivers"""
 		assert self.__mailboxCondition.locked()
-		receivers = self.__owner._getReceivers()
+		receivers = self.__currentProcess._getReceivers()
 		del self.__mailbox[i]
 		for receiver in receivers:
 			if receiver is not self:
+				# Acquire lock to prevent a remote process from calling addHandler and
+				# resetting __lastMessage:
 				receiver.__lock.acquire()
 				if receiver.__lastMessage > i:
 					receiver.__lastMessage -= 1
@@ -213,10 +215,20 @@ class Receiver:
 		_checkSignal()
 		return None
 
-	def __checkOwner(self):
-		"""check that current process is owner of this receiver"""
-		assert self_() is self.__owner, \
-				'Only the process that created a Receiver may invoke its methods'
+	def __checkCurrentProcess(self):
+		"""check that self.__currentProcess is still current process"""
+		currentProcess = self_()
+		if self.__currentProcess is currentProcess:
+			return
+		if self.__currentProcess is not None:
+			self.__currentProcess._removeReceiver(self)
+		self.__currentProcess = currentProcess
+		self.__mailbox = currentProcess._mailbox
+		self.__mailboxCondition = currentProcess._mailboxCondition
+		self.__lock.acquire()
+		self.__lastMessage = 0
+		self.__lock.release()
+		currentProcess._addReceiver(self)
 
 
 def _replaceMessageArgs(args, message):

@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.11 2004/08/24 21:05:23 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.12 2004/09/08 22:07:53 hobb0001 Exp $'
 
 
 import atexit
@@ -41,7 +41,6 @@ class Process:
 		self._mailbox = []
 		self._mailboxCondition = Condition()
 		self.__receiverRefs = []
-		self.__receiverRefsLock = allocateLock()
 		self.__signal = None
 		self.__signalSet = False
 		self.__trapExit = False
@@ -76,7 +75,8 @@ class Process:
 		"""Send signal to process"""
 		assert isinstance(signal, ExitError)
 		assert signal.proc is not self
-		assert self.isAlive()
+		if not self.isAlive():
+			return
 		self.__signalLock.acquire()
 		try:
 			if self.__trapExit and signal.reason != 'kill':
@@ -116,17 +116,27 @@ class Process:
 
 	def _addReceiver(self, receiver):
 		"""register a new receiver with this process"""
-		self.__receiverRefsLock.acquire()
+		self._mailboxCondition.acquire()
 		# We don't want the __receiverRefs list to prevent garbage collection of
 		# the receiver.
-		self.__receiverRefs.append(weakref.ref(receiver, self._removeReceiver))
-		self.__receiverRefsLock.release()
+		self.__receiverRefs.append(weakref.ref(receiver, self._removeReceiverRef))
+		self._mailboxCondition.release()
 
-	def _removeReceiver(self, ref):
+	def _removeReceiver(self, receiver):
+		"""unregister receiver from this process"""
+		self._mailboxCondition.acquire()
+		for i in xrange(len(self.__receiverRefs)):
+			if self.__receiverRefs[i]() is receiver:
+				del self.__receiverRefs[i]
+				break
+			# end if
+		self._mailboxCondition.release()
+
+	def _removeReceiverRef(self, ref):
 		"""called when no more [strong] references to a registered receiver"""
-		self.__receiverRefsLock.acquire()
+		self._mailboxCondition.acquire()
 		self.__receiverRefs.remove(ref)
-		self.__receiverRefsLock.release()
+		self._mailboxCondition.release()
 
 	def _getReceivers(self):
 		"""return list of registered receivers"""
@@ -135,9 +145,8 @@ class Process:
 			receiver = ref()
 			assert receiver is not None # _removeReceiver() shouldn't leave any strays
 			return receiver
-		self.__receiverRefsLock.acquire()
+		assert self._mailboxCondition.locked()
 		result = [deref(ref) for ref in self.__receiverRefs]
-		self.__receiverRefsLock.release()
 		return result
 
 	def _exit(self, exitError):
