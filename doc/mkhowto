@@ -1,7 +1,9 @@
 #!/bin/sh
+dir=candygram
 if [ "$1" = "sourceforge" ]; then
 	address=`cat sflogo.html`
+	dir=sourceforge
 	shift
 fi
 
-/usr/src/python-2.3.4-2/Doc/tools/mkhowto --about about.dat --split 4 --address "$address" $* candygram.tex
+/usr/src/python-2.3.4-2/Doc/tools/mkhowto --about about.dat --split 4 --address "$address" --dir $dir $* candygram.tex
