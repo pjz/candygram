@@ -6,7 +6,7 @@
 \authoraddress{
         Email: \email{mike@hobbshouse.org}
 }
-\release{1.0 beta 1}
+\release{1.0 beta 2}
 \setshortversion{1.0}
 
 \newcommand{\Erlang}{\ulink{Erlang}{http://www.erlang.org/}}
@@ -146,7 +146,7 @@ interprets it in the following way:
 	\item If the value is a list, then the same rule for tuples applies, except
 		for the last sub-pattern. The last sub-pattern in the list can match zero or
 		more values in the message. That is, the length of the message may be
-		\greaterthan\= len(pattern)-1 as long as all excess values match the last
+		\greaterthan= len(pattern)-1 as long as all excess values match the last
 		sub-pattern.
 	\item If the value is a dictionary, then a message will match only if it
 		is a dictionary that contains all of the same keys as the pattern value.
@@ -158,10 +158,14 @@ interprets it in the following way:
 \end{enumerate}
 
 \subsection{Examples}
-Let's illustrate these rules by example. In the table below, the first column
-contains a Python value that is used as a pattern. The second column contains
-Python values that match the pattern and the third column contains Python values
-that do not match the pattern.
+Let's illustrate these rules by example.\footnote
+{Do not use all of these examples at home. These are highly trained stunt
+patterns and are displayed here for demonstration purposes only. Specifically,
+you should rarely ever use more than one sub-pattern in a list pattern, nor
+should you ever use more than one type of key in a single dictionary.}
+ In the table below, the first column contains a Python value that is used as a
+pattern. The second column contains Python values that match the pattern and the
+third column contains Python values that do not match the pattern.
 \begin{tableiii}{l|l|l}{textrm}{Pattern}{Matches}{Non-Matches}
 \lineiii{Any}
 	{'text', 13.7, (1, '', lambda: true)}
