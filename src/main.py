@@ -20,9 +20,10 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: main.py,v 1.1 2004/08/19 22:10:47 hobb0001 Exp $'
+__revision__ = '$Id: main.py,v 1.2 2004/08/19 23:04:24 hobb0001 Exp $'
 
-from candygram import thread_impl
+
+from candygram.thread_impl import getCurrentThread
 
 
 def spawn(func, *args, **kwargs):
@@ -32,12 +33,14 @@ def spawn(func, *args, **kwargs):
 		raise ExitError('badarg')
 	return ThreadProcess(func, args, kwargs)
 
+
 def spawnLink(func, *args, **kwargs):
 	"""spawn and link to a new process atomically"""
 	_checkSignal()
 	if not callable(func):
 		raise ExitError('badarg')
 	return ThreadProcess(func, args, kwargs, self())
+
 
 def self(noCheck=False):
 	"""return current process"""
@@ -47,9 +50,9 @@ def self(noCheck=False):
 		_checkSignal()
 	getProcessMapLock().acquire()
 	try:
-		currentThread = thread_impl.getCurrentThread()
-		assert currentThread in getProcessMap(), 'Only the main thread or threads '\
-				'created by spawn*() may invoke self()'
+		currentThread = getCurrentThread()
+		assert currentThread in getProcessMap(), \
+				'Only the main thread or threads created by spawn*() may invoke self()'
 		result = getProcessMap()[currentThread]
 	finally:
 		getProcessMapLock().release()
@@ -58,6 +61,7 @@ def self(noCheck=False):
 # Alternate name so that the self() function can be used in class methods where
 # 'self' is already defined:
 self_ = self
+
 
 def exit(*args):
 	"""kill a process"""
@@ -72,6 +76,7 @@ def exit(*args):
 	args[0]._signal(ExitError(args[1]))
 	return True
 
+
 def link(proc):
 	"""link to a process"""
 	_checkSignal()
@@ -84,6 +89,7 @@ def link(proc):
 	proc._addLink(selfProc)
 	return True
 
+
 def unlink(proc):
 	"""remove link to a process"""
 	_checkSignal()
@@ -94,9 +100,11 @@ def unlink(proc):
 	selfProc._removeLink(proc)
 	return True
 
+
 def processFlag(flag, value):
 	"""set a process flag"""
 	return self()._processFlag(flag, value)
+
 
 def processes():
 	"""list all active processes"""
@@ -106,13 +114,15 @@ def processes():
 		return getProcessMap().values()
 	finally:
 		getProcessMapLock().release()
-	pass
+	# end try
+
 
 def isProcessAlive(proc):
 	"""return True if process is active"""
 	if not isinstance(proc, Process):
 		raise ExitError('badarg')
 	return proc.isAlive()
+
 
 def send(proc, msg):
 	"""send a message to process"""
@@ -121,9 +131,15 @@ def send(proc, msg):
 	return proc.send(msg)
 
 
+def _checkSignal():
+	"""check if a signal has been sent to current process"""
+	self(True)._checkSignal()
+
 
 class ExitError(Exception):
+
 	"""raised by EXIT signals"""
+
 	def __init__(self, reason, proc=None):
 		Exception.__init__(self, reason)
 		self.reason = reason
@@ -131,16 +147,9 @@ class ExitError(Exception):
 			self.proc = self_()
 		else:
 			self.proc = proc
-		pass
-
-
-
-def _checkSignal():
-	"""check if a signal has been sent to current process"""
-	self(True)._checkSignal()
-
+		# end if
 
 
 # We can't import these at the top, since the process module imports this one
 from candygram.process import Process, ThreadProcess, getProcessMap, \
-                              getProcessMapLock
+		getProcessMapLock

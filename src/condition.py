@@ -36,15 +36,20 @@ simplified by making the following assumptions:
    the lock.
 """
 
-__revision__ = '$Id: condition.py,v 1.2 2004/08/18 21:23:56 hobb0001 Exp $'
+__revision__ = '$Id: condition.py,v 1.3 2004/08/19 23:04:52 hobb0001 Exp $'
 
-import thread_impl
+
 import time
 
+from candygram.thread_impl import allocateLock
+
+
 class Condition:
+
 	"""modified Condition class"""
+
 	def __init__(self):
-		self.__lock = thread_impl.allocateLock()
+		self.__lock = allocateLock()
 		self.acquire = self.__lock.acquire
 		self.release = self.__lock.release
 		self.locked = self.__lock.locked
@@ -53,7 +58,7 @@ class Condition:
 	def wait(self, timeout=None):
 		"""wait for notify()"""
 		assert self.locked()
-		waiter = thread_impl.allocateLock()
+		waiter = allocateLock()
 		waiter.acquire()
 		self.__waiter = waiter
 		self.release()
@@ -61,7 +66,7 @@ class Condition:
 			return _acquire(waiter, timeout)
 		finally:
 			self.acquire()
-		pass
+		# end try
 
 	def notify(self):
 		"""wake up wait()ers"""
@@ -69,7 +74,8 @@ class Condition:
 		if self.__waiter is not None:
 			self.__waiter.release()
 			self.__waiter = None
-		pass
+		# end if
+
 
 def _acquire(lock, timeout):
 	"""try to acquire a lock, with a timeout"""
@@ -77,7 +83,7 @@ def _acquire(lock, timeout):
 		lock.acquire()
 		return True
 	timeout = time.time() + timeout
-	delay = 0.0005 # 500 us -> initial delay of 1 ms
+	delay = 0.0005  # 500 us -> initial delay of 1 ms
 	while True:
 		if lock.acquire(0):
 			return True

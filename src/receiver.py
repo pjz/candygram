@@ -20,7 +20,7 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.5 2004/08/19 22:54:55 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.6 2004/08/19 23:04:52 hobb0001 Exp $'
 
 
 import time
@@ -208,6 +208,7 @@ class Receiver:
 def _replaceMessageArgs(args, message):
 	"""replace any instance of Message with message"""
 	def change(arg):
+		"""convert arg to message if arg is Message"""
 		if arg is Message:
 			return message
 		return arg
