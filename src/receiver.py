@@ -20,7 +20,7 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.10 2004/09/08 22:07:53 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.11 2004/09/13 17:31:09 hobb0001 Exp $'
 
 
 import time
@@ -43,6 +43,7 @@ class Receiver:
 		_checkSignal()
 		# Lock for __handlers, __lastMessage,  and __timeout* attributes.
 		self.__lock = allocateLock()
+		self.__nextHandlerId = 0
 		self.__handlers = []
 		self.__lastMessage = 0
 		self.__currentProcess = None
@@ -60,12 +61,14 @@ class Receiver:
 			raise ExitError('badarg')
 		filter_ = genFilter(pattern)
 		self.__lock.acquire()
-		self.__handlers.append((filter_, handler, args, kwargs))
+		id = self.__nextHandlerId
+		self.__nextHandlerId += 1
+		self.__handlers.append((id, filter_, handler, args, kwargs))
 		# Clear all skipped messages, since the new handler might be able to handle
 		# them.
 		self.__lastMessage = 0
 		self.__lock.release()
-		return filter_
+		return id
 
 	def after(self, timeout, handler=None, *args, **kwargs):
 		"""add timeout handler to receiver"""
@@ -88,12 +91,35 @@ class Receiver:
 		_checkSignal()
 		if not isinstance(receiver, Receiver):
 			raise ExitError('badarg')
+		receiver.__lock.acquire()
+		handlers = receiver.__handlers[:]
+		receiver.__lock.release()
+		result = []
 		self.__lock.acquire()
-		self.__handlers.extend(receiver.__handlers)
-		# Clear all skipped messages, since the new handler might be able to handle
+		for _, filter_, handler, args, kwargs in handlers:
+			id = self.__nextHandlerId
+			self.__nextHandlerId += 1
+			self.__handlers.append((id, filter_, handler, args, kwargs))
+			result.append(id)
+		# Clear all skipped messages, since the new handlers might be able to handle
 		# them.
 		self.__lastMessage = 0
 		self.__lock.release()
+		return result
+
+	def removeHandler(self, handlerReference):
+		"""remove handler from receiver"""
+		self.__lock.acquire()
+		try:
+			for i in xrange(len(self.__handlers)):
+				if self.__handlers[i][0] == handlerReference:
+					del self.__handlers[i]
+					return
+				# end if
+			# end for
+		finally:
+			self.__lock.release()
+		raise ExitError('badarg')
 
 	def receive(self, timeout=None, handler=None, *args, **kwargs):
 		"""retrieve one message from mailbox"""
@@ -171,7 +197,7 @@ class Receiver:
 		try:
 			for i in xrange(self.__lastMessage, len(self.__mailbox)):
 				message = self.__mailbox[i]
-				for filter_, handler, args, kwargs in self.__handlers:
+				for _, filter_, handler, args, kwargs in self.__handlers:
 					if filter_(message):
 						self.__deleteMessage(i)
 						return message, handler, args, kwargs

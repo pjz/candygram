@@ -413,8 +413,9 @@ Register a handler function \var{func} for the \var{pattern}. The
 list when it receives a message that matches \var{pattern}. When a handler
 function \var{func} is not specified, the \method{receive()} method removes any
 matching message from the mailbox and does nothing more with it. Refer to
-section \ref{patterns} for details about how to specify message patterns. Raises
-a \code{'badarg'} \exception{ExitError} if \var{func} is not
+section \ref{patterns} for details about how to specify message patterns.
+Returns a handler reference that can be used with the \method{removeHandler()}
+method. Raises a \code{'badarg'} \exception{ExitError} if \var{func} is not
 \function{callable()}.
 
 If any of the \var{args} arguments is \constant{candygram.Message}, then the
@@ -462,9 +463,19 @@ example:
 Register all handler functions in \var{receiver} with this \class{Receiver}
 object. This method adds all of the patterns and handler functions that have
 been added to the given \var{receiver} to this receiver, in the same order. You
-can use this method to make copies of \class{Receiver} objects. Raises a
-\code{'badarg'} \exception{ExitError} if \var{receiver} is not a
+can use this method to make copies of \class{Receiver} objects. Returns a list
+of handler reference that can be used with the \method{removeHandler()} method.
+Raises a \code{'badarg'} \exception{ExitError} if \var{receiver} is not a
 \class{Receiver} instance.
+\end{methoddesc}
+
+\begin{methoddesc}{removeHandler}{handlerReference}
+Remove a handler function. The \var{handlerReference} is returned by the
+\method{addHandler()} and \method{addHandlers()} methods. Since all handler
+references are unique, this method will remove exactly one handler function
+from the \class{Receiver}. Raises a \code{'badarg'} \exception{ExitError} if
+\var{handlerReference} is not a proper reference, or if it refers to a handler
+function that is no longer in in the \class{Receiver}.
 \end{methoddesc}
 
 \begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
