@@ -5,6 +5,9 @@
 from distutils.core import setup
 import distutils.command.install_data
 from glob import glob
+import os
+
+PACKAGE = 'candygram'
 
 examples = glob('examples/*.py')
 docs = glob('doc/candygram/*')
@@ -17,12 +20,14 @@ class InstallData(distutils.command.install_data.install_data):
 		return distutils.command.install_data.install_data.run(self)
 
 setup(name = 'Candygram',
-		version = '1.0 beta 1',
+		version = '1.0b1',
 		license = 'GNU Lesser General Public License',
 		url = 'http://candygram.sourceforge.net',
 		author = 'Michael Hobbs',
 		author_email = 'mike@hobbshouse.org',
-		package_dir = {'candygram': 'src'},
-		packages = ['candygram'],
-		data_files = [('candygram/examples', examples), ('candygram/docs', docs)],
+		package_dir = {PACKAGE: 'src'},
+		packages = [PACKAGE],
+		data_files = [(PACKAGE+'/examples', examples),
+			(PACKAGE+'/docs', docs),
+			(PACKAGE, ['COPYING'])],
 		cmdclass = {'install_data': InstallData})

@@ -1,2 +1,7 @@
+include COPYING
 recursive-include examples *.py
-recursive-include doc/candygram *
+
+include doc/candygram/*
+include doc/*.tex
+include doc/about.dat
+include doc/mkhowto
