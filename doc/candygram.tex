@@ -607,6 +607,7 @@ Candygram.
 
 \begin{verbatim}
 >>> from candygram import *
+>>> import time
 >>> def proc_func():
 ...     r = Receiver()
 ...     r['land shark'] = lambda m: 'Go Away ' + m, Message
@@ -617,6 +618,8 @@ Candygram.
 >>> proc = spawn(proc_func)
 >>> proc | 'land shark'
 >>> proc | 'candygram'
+>>> # Give the proc a chance to print its messages before termination:
+... time.sleep(1)
 \end{verbatim}
 Running the code above produces the following output:
 \begin{verbatim}
@@ -628,6 +631,7 @@ The code above uses a rather Erlangy syntax. Here is a more Pythonic version
 that does the same:
 \begin{verbatim}
 >>> import candygram as cg
+>>> import time
 >>> def proc_func():
 ...     r = cg.Receiver()
 ...     r.addHandler('land shark', shut_door, cg.Message)
@@ -644,11 +648,14 @@ that does the same:
 >>> proc = cg.spawn(proc_func)
 >>> proc.send('land shark')
 >>> proc.send('candygram')
+>>> # Give the proc a chance to print its messages before termination:
+... time.sleep(1)
 \end{verbatim}
 
 Lastly, here is an example with more elaborate patterns:
 \begin{verbatim}
 >>> from candygram import *
+>>> import time
 >>> def proc_func(name):
 ...     r = Receiver()
 ...     r['msg', Process, str] = print_string, name, Message
@@ -672,6 +679,8 @@ Lastly, here is an example with more elaborate patterns:
 >>> a | ('msg', b, 'Girl Scout cookies')
 >>> a | 'plumber?'
 >>> a | ('msg', b, 'The meaning of life is:', 42)
+>>> # Give the proc a chance to print its messages before termination:
+... time.sleep(1)
 \end{verbatim}
 Running the code above produces the following output:
 \begin{verbatim}

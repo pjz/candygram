@@ -2,7 +2,6 @@
 
 
 import unittest
-import time
 import StringIO
 
 from candygram import *
@@ -17,6 +16,7 @@ class TestDocExample(unittest.TestCase):
 		self.out.close()
 
 	def test1(self):
+		import time
 		def proc_func():
 			r = Receiver()
 			r['land shark'] = lambda m: 'Go Away ' + m, Message
@@ -26,7 +26,7 @@ class TestDocExample(unittest.TestCase):
 		proc = spawn(proc_func)
 		proc | 'land shark'
 		proc | 'candygram'
-		# Allow spawned process time to process messages before we kill it.
+		# Give the proc a chance to print its messages before termination:
 		time.sleep(1)
 		exit(proc, 'kill')
 		# Assert print statements worked as advertised
@@ -36,6 +36,7 @@ class TestDocExample(unittest.TestCase):
 
 	def test2(self):
 		import candygram as cg
+		import time
 		def proc_func():
 			r = cg.Receiver()
 			r.addHandler('land shark', shut_door, cg.Message)
@@ -49,7 +50,7 @@ class TestDocExample(unittest.TestCase):
 		proc = cg.spawn(proc_func)
 		proc.send('land shark')
 		proc.send('candygram')
-		# Allow spawned process time to process messages before we kill it.
+		# Give the proc a chance to print its messages before termination:
 		time.sleep(1)
 		cg.exit(proc, 'kill')
 		# Assert print statements worked as advertised
@@ -58,6 +59,7 @@ class TestDocExample(unittest.TestCase):
 				'Hello candygram\n')
 
 	def test3(self):
+		import time
 		def proc_func(name):
 			r = Receiver()
 			r['msg', Process, str] = print_string, name, Message
@@ -78,7 +80,7 @@ class TestDocExample(unittest.TestCase):
 		a | ('msg', b, 'Girl Scout cookies')
 		a | 'plumber?'
 		a | ('msg', b, 'The meaning of life is:', 42)
-		# Allow spawned processes time to process messages before we kill them.
+		# Give the proc a chance to print its messages before termination:
 		time.sleep(1)
 		exit(a, 'kill')
 		exit(b, 'kill')
