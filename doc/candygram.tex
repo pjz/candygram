@@ -375,19 +375,130 @@ methods is invoked from a process other than the one that created it. Care
 should be taken, therefore, to make sure that a \class{Receiver} is created
 within the process that will be using it.
 
-\begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, \moreargs}}}
+\begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, args\moreargs}}}
+Register a handler function \var{func} to be called with the \var{args} argument
+list when a message matching \var{pattern} is received. When a handler function
+\var{func} is not specified, the receiver will remove any matching messages from
+the mailbox and do nothing more with them. Refer to section \ref{patterns} for
+details about how to specify message patterns. Raises an
+\exception{AssertionError} if \var{func} is not \function{callable()}.
 
-Some stuff about addHandler
+If any of the \var{args} parameters is \constant{candygram.Message}, then that
+parameter is replaced with the message that matched the pattern when \var{func}
+is invoked.
 
-When the \method{Receiver.receive()} method is called, the \class{Receiver}
-object compares the first message in its mailbox with each pattern, in the order
-that the handlers were added via the \addhandler\ method. If any pattern matches
-the message, it will call the associated function and return its result.
+Note that the handler functions are not invoked until the \method{receive()}
+method is called. Refer to the \method{receive()} documentation for details
+about the mechanism by which handlers are invoked.
+\end{methoddesc}
 
-If extra parameters are supplied in the call to \addhandler\ after the handler
-function, those parameters are passed to the handler function when it is called.
-If any of these function parameters is \constant{candygram.Message}, then the
-parameter is replaced with the message that was received.
+\begin{methoddesc}{__setitem__}{pattern, funcWithArgs}
+An alias for the \method{addHandler()} method. If \var{funcWithArgs} is a tuple,
+then the first element in the tuple is sent as the \var{func} parameter to
+\method{addHandler()} and the remaining elements are sent as the \var{args}. If
+\var{funcWithArgs} is not a tuple, then it is assumed to be a handler function
+and sent as the \var{func} parameter to \method{addHandler()}.
+
+\method{__setitem__()} is aliased to the \method{addHandler()} method so that
+handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
+are specified using `\var{pattern} -\greaterthan\ \var{func}' syntax. For
+example:
+\begin{verbatim}
+>>> r = Receiver()
+>>> r['knock-knock', 'candygram'] = answer, 'From whom?'
+\end{verbatim}
+\end{methoddesc}
+
+\begin{methoddesc}{__getitem__}{pattern}
+An alias for the \method{addHandler()} method. Using \method{__getitem__()} is
+equivalent to calling \method{addHandler()} without a \var{func} parameter.
+
+\method{__getitem__()} is aliased to the \method{addHandler()} method so that
+handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
+are specified using `\var{pattern} -\greaterthan\ \var{func}' syntax. For
+example:
+\begin{verbatim}
+>>> r = Receiver()
+>>> r['knock-knock', 'dolphin']  # ignore dolphins
+\end{verbatim}
+\end{methoddesc}
+
+\begin{methoddesc}{addHandlers}{receiver}
+Register all handler functions in \var{receiver} with this \class{Receiver}
+object. All patterns and handler functions that have been added to the given
+\var{receiver} will be added to this receiver, in the same order. You can use
+this method to make copies of \class{Receiver} objects. It is admissable to
+use a \var{receiver} that was created in a different process.
+\end{methoddesc}
+
+\begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
+Register a timeout handler function \var{func} to be called with the \var{args}
+argument list when no matching message is received within \var{timeout}
+milliseconds. Raises an \exception{AssertionError} if \var{func} is not
+\function{callable()} or if the \method{after()} method has already been
+invoked.
+
+If the \method{receive()} method does not find a matching message within
+\var{timeout} milliseconds, it will invoke \var{func} with \var{args} and return
+the result. When a handler function \var{func} is not specified, the
+\method{receive()} method will return \constant{None} if it times out.
+
+None of the \var{args} parameters should be \constant{candygram.Message}, since
+there is no message to pass when a timeout occurs.
+\end{methoddesc}
+
+\begin{methoddesc}{receive}{\optional{timeout\optional{, func\optional{, args\moreargs}}}}
+Find a matching message in the process's mailbox, invoke the related handler
+function, and return the result. When the \method{receive()} method is called,
+the \class{Receiver} object compares the first message in the process's mailbox
+with each of its registered patterns, in the order that the handlers were added
+via the \method{addHandler()} method. If any pattern matches the message, the
+message is removed from the mailbox and the \method{receive()} method will then
+call the associated function and return its result. If no handler function is
+associated with the matching pattern, \method{receive()} will return
+\constant{None}. If no pattern matches the message, the message is left in the
+mailbox and the \method{receive()} method skips to the next message in the
+mailbox and compares it with each of the patterns. It continues on through each
+of the messages in the mailbox until a match is found.
+
+If no message matches any of the patterns, or if the mailbox is empty, the
+\method{receive()} method blocks until the process receives a message that does
+match one of the patterns, or until the given \var{timeout} has elapsed. If no
+\var{timeout} is specified, the \method{receive()} method will block
+indefinitely. If a \var{timeout} is specified, it is equivalent to calling
+\method{after(\var{timeout}, \var{func}, \var{args})} just prior to
+\method{receive()}. An \exception{AssertionError} will therefore be raised if
+\var{func} is not \function{callable()} or if the \method{after()} method has
+already been invoked.
+\end{methoddesc}
+
+\begin{methoddesc}{__call__}{\optional{timeout\optional{, func\optional{, args\moreargs}}}}
+An alias for the \method{receive()} method. \method{__call__()} is aliased to
+the \method{receive()} method so that \class{Receiver}s can be used with a
+shortened, more Erlangy syntax. For example:
+\begin{verbatim}
+>>> def convert():
+...     r = Receiver()
+...     r['one'] = lambda: 1
+...     r['two'] = lambda: 2
+...     r['three'] = lambda: 3
+...     return r()
+\end{verbatim}
+\end{methoddesc}
+
+\begin{methoddesc}{__iter__}{}
+Return an iterator that repeatedly invokes \method{receive()}. The following
+idiom is often encountered in Candygram code:
+\begin{verbatim}
+... while True:
+...     result = receiver.receive()
+...     # do whatever with the result...
+\end{verbatim}
+With an iterator, the code above can be spelled like this instead:
+\begin{verbatim}
+... for result in receiver:
+...     # do whatever with the result...
+\end{verbatim}
 \end{methoddesc}
 
 \end{classdesc}
