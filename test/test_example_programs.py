@@ -89,6 +89,7 @@ class TestExamplePrograms(unittest.TestCase):
 			start = time.time()
 			proc = dict['timeout'](1000, 'alarm')
 			self.assertEqual(r.receive(), 'beep')
+			time.sleep(PAUSE)
 			self.assert_(not proc.isAlive())
 			start = time.time()
 			proc = dict['timeout'](1000, 'alarm')

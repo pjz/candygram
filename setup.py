@@ -26,7 +26,7 @@ class InstallData(distutils.command.install_data.install_data):
 
 
 setup(name = 'Candygram',
-		version = '1.0b2',
+		version = '1.0',
 		license = 'GNU Lesser General Public License',
 		url = 'http://candygram.sourceforge.net',
 		author = 'Michael Hobbs',
@@ -42,7 +42,7 @@ setup(name = 'Candygram',
 		keywords = ['erlang', 'concurrent', 'threads', 'message', 'passing'],
 		platforms = ['Python'],
 		classifiers = [
-				'Development Status :: 4 - Beta',
+				'Development Status :: 5 - Production/Stable',
 				'Intended Audience :: Developers',
 				'License :: OSI Approved :: ' \
 						'GNU Library or Lesser General Public License (LGPL)',
@@ -54,7 +54,7 @@ setup(name = 'Candygram',
 				'Programming Language :: Python',
 				'Topic :: Software Development :: Libraries :: Python Modules'],
 		download_url = 'http://sourceforge.net/project/showfiles.php?' \
-				'group_id=114295&package_id=123762&release_id=267770',
+				'group_id=114295&package_id=123762&release_id=276784',
 		package_dir = {PACKAGE: 'src'},
 		packages = [PACKAGE],
 		data_files = [(PACKAGE+'/examples', examples),
