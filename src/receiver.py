@@ -20,7 +20,7 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.11 2004/09/13 17:31:09 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.12 2004/09/13 20:11:58 hobb0001 Exp $'
 
 
 import time
@@ -61,14 +61,14 @@ class Receiver:
 			raise ExitError('badarg')
 		filter_ = genFilter(pattern)
 		self.__lock.acquire()
-		id = self.__nextHandlerId
+		handlerId = self.__nextHandlerId
 		self.__nextHandlerId += 1
-		self.__handlers.append((id, filter_, handler, args, kwargs))
+		self.__handlers.append((handlerId, filter_, handler, args, kwargs))
 		# Clear all skipped messages, since the new handler might be able to handle
 		# them.
 		self.__lastMessage = 0
 		self.__lock.release()
-		return id
+		return handlerId
 
 	def after(self, timeout, handler=None, *args, **kwargs):
 		"""add timeout handler to receiver"""
@@ -96,11 +96,11 @@ class Receiver:
 		receiver.__lock.release()
 		result = []
 		self.__lock.acquire()
-		for _, filter_, handler, args, kwargs in handlers:
-			id = self.__nextHandlerId
+		for id_, filter_, handler, args, kwargs in handlers:
+			handlerId = self.__nextHandlerId
 			self.__nextHandlerId += 1
-			self.__handlers.append((id, filter_, handler, args, kwargs))
-			result.append(id)
+			self.__handlers.append((handlerId, filter_, handler, args, kwargs))
+			result.append(handlerId)
 		# Clear all skipped messages, since the new handlers might be able to handle
 		# them.
 		self.__lastMessage = 0
@@ -197,7 +197,7 @@ class Receiver:
 		try:
 			for i in xrange(self.__lastMessage, len(self.__mailbox)):
 				message = self.__mailbox[i]
-				for _, filter_, handler, args, kwargs in self.__handlers:
+				for id_, filter_, handler, args, kwargs in self.__handlers:
 					if filter_(message):
 						self.__deleteMessage(i)
 						return message, handler, args, kwargs

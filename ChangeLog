@@ -3,6 +3,7 @@ Candygram 1.0 beta 2:
     * A single Receiver object may be used by multiple processes.
     * Added Receiver.removeHandler() method.
     * Can pass a Process subclass to spawn() and spawnLink().
+    * New wxProcess example class integrates Candygram with wxPython.
     * Updated FAQ.
 
 Candygram 1.0 beta 1:

@@ -81,8 +81,9 @@ Erlang uses a peculiar terminology in respect to threads. In Erlang parlance,
 threads are called ``processes''. This terminology is due to a couple of
 reasons. First, the Erlang runtime environment is a virtual machine. Second,
 because Erlang is a functional language, no state is shared among its threads.
-Since the concurrent tasks in an Erlang system run as peers within a single
-[virtual] machine and don't share state, they are therefore named ``Processes''.
+Since the concurrent tasks in an Erlang system run as top-level peers within a
+single [virtual] machine and don't share state, they are therefore named
+``Processes''.
 
 To avoid confusion when using this document alongside the Erlang documentation,
 the remainder of this document uses the word ``process'' instead of ``thread''.
@@ -135,7 +136,8 @@ first argument passed to the \method{Receiver.addHandler()} method can be any
 Python value. The \addhandler\ method uses this value as a pattern and
 interprets it in the following way:
 \begin{enumerate}
-	\item If the value is \constant{candygram.Any}, then any message will match.
+	\item If the value is the constant, \constant{candygram.Any}, then any message
+		will match.
 	\item If the value is a type object or a class, then any message that
 		\function{isinstance()} of the type or class will match.
 	\item If the value is \function{callable()}, then a message will match if the
@@ -238,7 +240,7 @@ When the function \var{func} returns, the process terminates. Raises a
 \function{callable()}.
 
 If you define a subclass of \class{Process}, you can instruct the
-\function{spawn()} function to create an instance of that class by passing in
+\function{spawn()} function to create an instance of that class by passing
 the class with the optional \var{_processClass} keyword argument.
 \end{funcdesc}
 
@@ -275,7 +277,7 @@ the newly created process. Raises a \code{'badarg'} \exception{ExitError} if
 
 If you define a subclass of \class{Process}, you can instruct the
 \function{spawnLink()} function to create an instance of that class by passing
-in the class with the optional \var{_processClass} keyword argument.
+the class with the optional \var{_processClass} keyword argument.
 \end{funcdesc}
 
 \begin{funcdesc}{unlink}{proc}
@@ -464,18 +466,18 @@ Register all handler functions in \var{receiver} with this \class{Receiver}
 object. This method adds all of the patterns and handler functions that have
 been added to the given \var{receiver} to this receiver, in the same order. You
 can use this method to make copies of \class{Receiver} objects. Returns a list
-of handler reference that can be used with the \method{removeHandler()} method.
+of handler references that can be used with the \method{removeHandler()} method.
 Raises a \code{'badarg'} \exception{ExitError} if \var{receiver} is not a
 \class{Receiver} instance.
 \end{methoddesc}
 
 \begin{methoddesc}{removeHandler}{handlerReference}
 Remove a handler function. The \var{handlerReference} must be a value returned
-by either the \method{addHandler()} or \method{addHandlers()} method. Since all
-handler references are unique, this method removes exactly one handler function
-from the \class{Receiver}. Raises a \code{'badarg'} \exception{ExitError} if
-\var{handlerReference} is not a proper reference, or if it refers to a handler
-function that is not in the \class{Receiver}.
+by either the \method{addHandler()} or the \method{addHandlers()} method. Since
+all handler references are unique, this method removes exactly one handler
+function from the \class{Receiver}. Raises a \code{'badarg'}
+\exception{ExitError} if \var{handlerReference} is not a proper reference, or if
+it refers to a handler function that is not in the \class{Receiver}.
 \end{methoddesc}
 
 \begin{methoddesc}{after}{timeout\optional{, func\optional{, args\moreargs}}}
@@ -735,9 +737,10 @@ process, a thread, or a microthread?}
 The short answer is that it creates a thread. In Erlang, the \function{spawn()}
 function creates a microthread but calls it a ``process''. Since Python does not
 yet support microthreads, the Candygram \function{spawn()} function creates a
-standard thread and calls it a ``process''. Despite the terminology, no new
-operating system processes are ever created. Refer to the overview (section
-\ref{overview}) for further explanation.
+standard thread instead and likewise calls it a ``process''. Despite the
+terminology, no new operating system processes are ever created. Refer to the
+overview in section \ref{overview} for further explanation about the
+terminology.
 
 \subsection{How many processes can I \function{spawn()}?}
 Since Candygram's \function{spawn()} function creates a new thread, it depends

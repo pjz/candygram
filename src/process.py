@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.15 2004/09/10 21:12:46 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.16 2004/09/13 20:11:58 hobb0001 Exp $'
 
 
 import atexit
@@ -238,14 +238,14 @@ class RootProcess(Process):
 		sys.excepthook = self.__excepthook
 		atexit.register(self.__atexit)
 
-	def _startThread(func, args, kwargs, initialLink=None):
+	def _startThread(self, func, args, kwargs, initialLink):
 		"""Start process running on new thread"""
 		raise NotImplementedError('RootProcess does not run on a thread')
 
-	def __excepthook(self, type, value, traceback):
+	def __excepthook(self, type_, value, traceback):
 		"""invoked when unhandled exception is raised"""
 		self.__exceptionRaised = True
-		return self.__origExcepthook(type, value, traceback)
+		return self.__origExcepthook(type_, value, traceback)
 
 	def __atexit(self):
 		"""invoked when interpreter is exiting"""
