@@ -20,7 +20,7 @@
 
 """Receiver class"""
 
-__revision__ = '$Id: receiver.py,v 1.12 2004/09/13 20:11:58 hobb0001 Exp $'
+__revision__ = '$Id: receiver.py,v 1.13 2005/02/14 20:56:35 hobb0001 Exp $'
 
 
 import time
@@ -134,14 +134,17 @@ class Receiver:
 		self.__lock.release()
 		handlerInfo = None
 		self.__mailboxCondition.acquire()
-		while handlerInfo is None:
-			handlerInfo = self.__scanMailbox()
-			# If none of the filters picked up a message from the mailbox, wait
-			# until a new message is sent and then try again.
-			if handlerInfo is None:
-				handlerInfo = self.__wait(expire)
-			# end if
-		self.__mailboxCondition.release()
+		# self.__wait() may raise an exception if this process has received a signal
+		try:
+			while handlerInfo is None:
+				handlerInfo = self.__scanMailbox()
+				# If none of the filters picked up a message from the mailbox, wait
+				# until a new message is sent and then try again.
+				if handlerInfo is None:
+					handlerInfo = self.__wait(expire)
+				# end if
+		finally:
+			self.__mailboxCondition.release()
 		if timeout is not None:
 			self.__removeAfter()
 		message, handler, args, kwargs = handlerInfo
