@@ -53,7 +53,7 @@ setup(name = 'Candygram',
 				'Programming Language :: Erlang',
 				'Programming Language :: Python',
 				'Topic :: Software Development :: Libraries :: Python Modules'],
-		download_url = 'https//sourceforge.net/project/showfiles.php?' \
+		download_url = 'http://sourceforge.net/project/showfiles.php?' \
 				'group_id=114295&package_id=123762&release_id=267770',
 		package_dir = {PACKAGE: 'src'},
 		packages = [PACKAGE],
