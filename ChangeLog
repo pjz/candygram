@@ -1,0 +1,9 @@
+Candygram 1.0 beta 2:
+    * Changed behavior of list patterns to repeat last element.
+    * A single Receiver object may be used by multiple processes.
+    * Added Receiver.removeHandler() method.
+    * Can pass a Process subclass to spawn() and spawnLink().
+    * Updated FAQ.
+
+Candygram 1.0 beta 1:
+    * Initial public release.
