@@ -363,7 +363,7 @@ syntax. In Erlang, messages are sent using the `!' primitive. For example:
 \begin{classdesc}{Receiver}{}
 Retrieves messages from a process's mailbox. Every process maintains a mailbox,
 which contains messages that have been sent to it via the \method{send()}
-method. To retreive the messages out of the mailbox, a process must use a
+method. To retrieve the messages out of the mailbox, a process must use a
 \class{Receiver} object. Like the \keyword{receive} statement in Erlang, a
 \class{Receiver} object will match an incoming message against multiple patterns
 [\ref{patterns}] and will then invoke the callback function that is associated
@@ -378,14 +378,14 @@ within the process that will be using it.
 \begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, args\moreargs}}}
 Register a handler function \var{func} to be called with the \var{args} argument
 list when a message matching \var{pattern} is received. When a handler function
-\var{func} is not specified, the receiver will remove any matching messages from
-the mailbox and do nothing more with them. Refer to section \ref{patterns} for
-details about how to specify message patterns. Raises an
-\exception{AssertionError} if \var{func} is not \function{callable()}.
+\var{func} is not specified, the \method{receive()} method will remove any
+matching messages from the mailbox and do nothing more with them. Refer to
+section \ref{patterns} for details about how to specify message patterns. Raises
+an \exception{AssertionError} if \var{func} is not \function{callable()}.
 
-If any of the \var{args} parameters is \constant{candygram.Message}, then that
-parameter is replaced with the message that matched the pattern when \var{func}
-is invoked.
+If any of the \var{args} parameters is \constant{candygram.Message}, then when
+\var{func} is invoked, that parameter is replaced with the message that matched
+the pattern.
 
 Note that the handler functions are not invoked until the \method{receive()}
 method is called. Refer to the \method{receive()} documentation for details
@@ -401,7 +401,7 @@ and sent as the \var{func} parameter to \method{addHandler()}.
 
 \method{__setitem__()} is aliased to the \method{addHandler()} method so that
 handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
-are specified using `\var{pattern} -\greaterthan\ \var{func}' syntax. For
+are specified using ``\var{pattern} -\greaterthan\ \var{func}'' syntax. For
 example:
 \begin{verbatim}
 >>> r = Receiver()
@@ -415,7 +415,7 @@ equivalent to calling \method{addHandler()} without a \var{func} parameter.
 
 \method{__getitem__()} is aliased to the \method{addHandler()} method so that
 handlers can be specified using a more Erlangy syntax. In Erlang, pattern guards
-are specified using `\var{pattern} -\greaterthan\ \var{func}' syntax. For
+are specified using ``\var{pattern} -\greaterthan\ \var{func}'' syntax. For
 example:
 \begin{verbatim}
 >>> r = Receiver()
@@ -427,7 +427,7 @@ example:
 Register all handler functions in \var{receiver} with this \class{Receiver}
 object. All patterns and handler functions that have been added to the given
 \var{receiver} will be added to this receiver, in the same order. You can use
-this method to make copies of \class{Receiver} objects. It is admissable to
+this method to make copies of \class{Receiver} objects. It is admissible to
 use a \var{receiver} that was created in a different process.
 \end{methoddesc}
 
