@@ -73,18 +73,6 @@ class Receiver:
 		self.__checkOwner()
 		self.__setAfter(timeout, handler, args, kwargs)
 
-	def __setAfter(self, timeout, handler, args, kwargs):
-		assert self.__timeout is None, 'A timeout has already been set for this '\
-				'Receiver'
-		assert type(timeout) is types.IntType,'The timeout value must be an integer'
-		if handler is not None:
-			assert callable(handler),'The handler value must be callable'
-		# Timeout is specified in milliseconds
-		self.__timeout = float(timeout) / 1000
-		self.__timeoutHandler = handler
-		self.__timeoutArgs = args
-		self.__timeoutKWArgs = kwargs
-
 	def __setitem__(self, key, value):
 		if type(value) is types.TupleType:
 			self.addHandler(key, value[0], *value[1:])
@@ -122,6 +110,8 @@ class Receiver:
 				handlerInfo = self.__wait(expire)
 			pass
 		self.__mailboxCondition.release()
+		if timeout is not None:
+			self.__removeAfter()
 		message, handler, args, kwargs = handlerInfo
 		if handler is None:
 			return None
@@ -134,6 +124,25 @@ class Receiver:
 
 	def __iter__(self):
 		return self
+
+	def __setAfter(self, timeout, handler, args, kwargs):
+		assert self.__timeout is None, 'A timeout has already been set for this '\
+				'Receiver'
+		assert type(timeout) is types.IntType,'The timeout value must be an integer'
+		if handler is not None:
+			assert callable(handler),'The handler value must be callable'
+		# Timeout is specified in milliseconds
+		self.__timeout = float(timeout) / 1000
+		self.__timeoutHandler = handler
+		self.__timeoutArgs = args
+		self.__timeoutKWArgs = kwargs
+
+	def __removeAfter(self):
+		assert self.__timeout is not None
+		self.__timeout = None
+		self.__timeoutHandler = None
+		self.__timeoutArgs = None
+		self.__timeoutKWArgs = None
 
 	def __scanMailbox(self):
 		assert self.__mailboxCondition.locked()
