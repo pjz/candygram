@@ -18,15 +18,19 @@
 # along with Candygram; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""Process classes"""
+
+__revision__ = '$Id: process.py,v 1.3 2004/08/18 22:10:24 hobb0001 Exp $'
+
 from candygram import ExitError, _checkSignal
 import thread_impl
 import condition
 import types
-import thread
 import atexit
 import sys
 
 class Process:
+	"""Abstract Process class"""
 	def __init__(self):
 		self.__alive = True
 		self._mailbox = []
@@ -41,11 +45,13 @@ class Process:
 		self.__linksLock = thread_impl.allocateLock()
 
 	def isAlive(self):
+		"""Return True if process is still running"""
 		return self.__alive
 
 	isProcessAlive = isAlive
 
 	def send(self, message):
+		"""Send message to process"""
 		_checkSignal()
 		if not self.isAlive():
 			return message
@@ -61,6 +67,7 @@ class Process:
 		return '<PID %d>' % id(self)
 
 	def _signal(self, signal):
+		"""Send signal to process"""
 		assert isinstance(signal, ExitError)
 		assert signal.proc is not self
 		self.__signalLock.acquire()
@@ -83,6 +90,7 @@ class Process:
 		self._mailboxCondition.release()
 
 	def _addLink(self, proc):
+		"""link a proc with this process"""
 		if not proc.__alive:
 			self._signal(ExitError('noproc', proc))
 			return
@@ -93,6 +101,7 @@ class Process:
 		self.__linksLock.release()
 
 	def _removeLink(self, proc):
+		"""remove link to proc from this process"""
 		procId = id(proc)
 		self.__linksLock.acquire()
 		if procId in self.__links:
@@ -100,6 +109,7 @@ class Process:
 		self.__linksLock.release()
 
 	def _exit(self, exitError):
+		"""signal that process has terminated"""
 		self.__alive = False
 		self.__linksLock.acquire()
 		links = self.__links.values()
@@ -109,6 +119,7 @@ class Process:
 		pass
 
 	def _processFlag(self, flag, value):
+		"""set a process flag"""
 		if flag == 'trap_exit':
 			if type(value) is not types.BooleanType:
 				raise ExitError('badarg')
@@ -122,6 +133,7 @@ class Process:
 		pass
 
 	def _checkSignal(self):
+		"""check if a signal has been received"""
 		# Since self.__signalSet is just a boolean value, we don't need to worry
 		# about acquiring a lock before inspecting its value. This way, we can check
 		# if a signal has been set much more quickly.
@@ -136,6 +148,7 @@ class Process:
 		pass
 
 	def _raise(self, signal):
+		"""raise an exception for signal"""
 		assert isinstance(signal, ExitError)
 		reason = signal.reason
 		if type(reason) is types.TupleType and len(reason) == 3 and \
@@ -145,7 +158,8 @@ class Process:
 
 
 
-class _ThreadProcess(Process):
+class ThreadProcess(Process):
+	"""A process that is running on a thread"""
 	def __init__(self, func, args, kwargs, initialLink=None):
 		Process.__init__(self)
 		self.__func = func
@@ -157,45 +171,50 @@ class _ThreadProcess(Process):
 		thread_impl.startThread(self.__run, ())
 
 	def __run(self):
+		"""main function of thread"""
 		currentThread = thread_impl.getCurrentThread()
-		ProcessMapLock().acquire()
-		ProcessMap()[currentThread] = self
-		ProcessMapLock().release()
+		getProcessMapLock().acquire()
+		getProcessMap()[currentThread] = self
+		getProcessMapLock().release()
 		exitError = ExitError('normal', self)
 		try:
 			self.__func(*self.__args, **self.__kwargs)
-		except ExitError, e:
-			exitError = e
+		except ExitError, ex:
+			exitError = ex
 		except:
 			exitError = ExitError(sys.exc_info(), self)
 		self._exit(exitError)
-		ProcessMapLock().acquire()
-		del ProcessMap()[currentThread]
-		ProcessMapLock().release()
+		getProcessMapLock().acquire()
+		del getProcessMap()[currentThread]
+		getProcessMapLock().release()
 
 
 
-class _RootProcess(Process):
+class RootProcess(Process):
+	"""a process that represents the main thread"""
 	def __init__(self):
 		Process.__init__(self)
 		atexit.register(self.__atexit)
 
 	def __atexit(self):
+		"""invoked when interpreter is exiting"""
 		_checkSignal()
 		self._exit(ExitError('normal', self))
 
-_ProcessMap = None
-_ProcessMapLock = None
+ProcessMap = None
+ProcessMapLock = None
 
-def ProcessMap():
-	global _ProcessMap
-	if _ProcessMap is None:
-		_ProcessMap = {thread_impl.getCurrentThread(): _RootProcess()}
-	return _ProcessMap
+def getProcessMap():
+	"""return value of ProcessMap"""
+	global ProcessMap
+	if ProcessMap is None:
+		ProcessMap = {thread_impl.getCurrentThread(): RootProcess()}
+	return ProcessMap
 
-def ProcessMapLock():
-	global _ProcessMapLock
-	if _ProcessMapLock is None:
-		_ProcessMapLock = thread_impl.allocateLock()
-	return _ProcessMapLock
+def getProcessMapLock():
+	"""return value of ProcessMapLock"""
+	global ProcessMapLock
+	if ProcessMapLock is None:
+		ProcessMapLock = thread_impl.allocateLock()
+	return ProcessMapLock
 

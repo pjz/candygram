@@ -88,13 +88,13 @@ function-rgx=_?[a-z][a-zA-Z0-9]*$
 method-rgx=_{0,2}[a-z][a-zA-Z0-9]*_{0,2}$
 
 # Regular expression which should only match correct argument names
-argument-rgx=[a-z][a-zA-Z0-9]*$
+argument-rgx=[a-z][a-zA-Z0-9]*_?$
 
 # Regular expression which should only match correct variable names
-variable-rgx=[a-z][a-zA-Z0-9]*$
+variable-rgx=[a-z][a-zA-Z0-9]*_?$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=i,j,k,ex,Run
+good-names=i,j,k,ex,Run,t,x
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar,baz,toto,tutu,tata

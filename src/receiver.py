@@ -18,6 +18,10 @@
 # along with Candygram; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+"""Receiver class"""
+
+__revision__ = '$Id: receiver.py,v 1.4 2004/08/18 22:10:24 hobb0001 Exp $'
+
 from candygram import _checkSignal, self_
 from pattern import genFilter
 import types
@@ -29,6 +33,7 @@ import weakref
 Message = object()
 
 class Receiver:
+	"""Retrieves messages from process's mailbox"""
 	def __init__(self):
 		_checkSignal()
 		self.__handlers = []
@@ -47,6 +52,7 @@ class Receiver:
 		self.__receiverRefsLock.release()
 
 	def __finalizeRef(self, ref):
+		"""called when no more [strong] references to self"""
 		assert ref is self
 		self.__receiverRefsLock.acquire()
 		for i in range(len(self.__receiverRefs)):
@@ -57,6 +63,7 @@ class Receiver:
 		self.__receiverRefsLock.release()
 
 	def addHandler(self, pattern, handler=None, *args, **kwargs):
+		"""add pattern handler to receiver"""
 		_checkSignal()
 		self.__checkOwner()
 		if handler is not None:
@@ -69,6 +76,7 @@ class Receiver:
 		return filter_
 
 	def after(self, timeout, handler=None, *args, **kwargs):
+		"""add timeout handler to receiver"""
 		_checkSignal()
 		self.__checkOwner()
 		self.__setAfter(timeout, handler, args, kwargs)
@@ -85,6 +93,7 @@ class Receiver:
 		return None
 
 	def addHandlers(self, receiver):
+		"""copy handlers from receiver to self"""
 		_checkSignal()
 		self.__checkOwner()
 		self.__handlers.extend(receiver.__handlers)
@@ -93,6 +102,7 @@ class Receiver:
 		self.__lastMessage = 0
 
 	def receive(self, timeout=None, handler=None, *args, **kwargs):
+		"""retrieve one message from mailbox"""
 		_checkSignal()
 		self.__checkOwner()
 		if timeout is not None:
@@ -126,6 +136,7 @@ class Receiver:
 		return self
 
 	def __setAfter(self, timeout, handler, args, kwargs):
+		"""set timeout handler"""
 		assert self.__timeout is None, 'A timeout has already been set for this '\
 				'Receiver'
 		assert type(timeout) is types.IntType,'The timeout value must be an integer'
@@ -138,6 +149,7 @@ class Receiver:
 		self.__timeoutKWArgs = kwargs
 
 	def __removeAfter(self):
+		"""remove timeout handler"""
 		assert self.__timeout is not None
 		self.__timeout = None
 		self.__timeoutHandler = None
@@ -145,6 +157,7 @@ class Receiver:
 		self.__timeoutKWArgs = None
 
 	def __scanMailbox(self):
+		"""see if any message in mailbox matches a registered pattern"""
 		assert self.__mailboxCondition.locked()
 		for i in xrange(self.__lastMessage, len(self.__mailbox)):
 			message = self.__mailbox[i]
@@ -157,6 +170,7 @@ class Receiver:
 		return None
 
 	def __deleteMessage(self, i):
+		"""remove i'th message from mailbox, notifying any other receivers"""
 		assert self.__mailboxCondition.locked()
 		self.__receiverRefsLock.acquire()
 		del self.__mailbox[i]
@@ -169,6 +183,7 @@ class Receiver:
 		self.__receiverRefsLock.release()
 
 	def __wait(self, expire):
+		"""wait expire milliseconds for a new message"""
 		waitTime = None
 		if expire is not None:
 			waitTime = max(0, expire - time.time())
@@ -180,10 +195,12 @@ class Receiver:
 		return None
 
 	def __checkOwner(self):
+		"""check that current process is owner of this receiver"""
 		assert self_() is self.__owner, 'Only the process that created a Receiver '\
 				'may invoke its methods'
 
 def _replaceMessageArgs(args, message):
+	"""replace any instance of Message with message"""
 	result = []
 	for arg in args:
 		if arg is Message:
@@ -194,6 +211,7 @@ def _replaceMessageArgs(args, message):
 	return result
 
 def _replaceMessageKWArgs(kwargs, message):
+	"""replace any instance of Message with message"""
 	result = {}
 	for key, value in kwargs.items():
 		if value is Message:

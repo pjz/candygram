@@ -20,7 +20,7 @@
 
 """Erlang concurrency primitives"""
 
-__revision__ = '$Id: candygram.py,v 1.3 2004/08/18 21:23:56 hobb0001 Exp $'
+__revision__ = '$Id: candygram.py,v 1.4 2004/08/18 22:10:24 hobb0001 Exp $'
 
 import thread_impl
 
@@ -30,14 +30,14 @@ def spawn(func, *args, **kwargs):
 	_checkSignal()
 	if not callable(func):
 		raise ExitError('badarg')
-	return _ThreadProcess(func, args, kwargs)
+	return ThreadProcess(func, args, kwargs)
 
 def spawnLink(func, *args, **kwargs):
 	"""spawn and link to a new process atomically"""
 	_checkSignal()
 	if not callable(func):
 		raise ExitError('badarg')
-	return _ThreadProcess(func, args, kwargs, self())
+	return ThreadProcess(func, args, kwargs, self())
 
 def self(noCheck=False):
 	"""return current process"""
@@ -45,14 +45,14 @@ def self(noCheck=False):
 	# don't call _checkSignal() if noCheck is set.
 	if not noCheck:
 		_checkSignal()
-	ProcessMapLock().acquire()
+	getProcessMapLock().acquire()
 	try:
 		currentThread = thread_impl.getCurrentThread()
-		assert currentThread in ProcessMap(), 'Only the main thread or threads ' \
+		assert currentThread in getProcessMap(), 'Only the main thread or threads '\
 				'created by spawn*() may invoke self()'
-		result = ProcessMap()[currentThread]
+		result = getProcessMap()[currentThread]
 	finally:
-		ProcessMapLock().release()
+		getProcessMapLock().release()
 	return result
 
 # Alternate name so that the self() function can be used in class methods where
@@ -101,11 +101,11 @@ def processFlag(flag, value):
 def processes():
 	"""list all active processes"""
 	_checkSignal()
-	ProcessMapLock().acquire()
+	getProcessMapLock().acquire()
 	try:
-		return ProcessMap().values()
+		return getProcessMap().values()
 	finally:
-		ProcessMapLock().release()
+		getProcessMapLock().release()
 	pass
 
 def isProcessAlive(proc):
@@ -142,4 +142,4 @@ def _checkSignal():
 
 
 # We can't import these at the top, since the process module imports this one
-from process import Process, _ThreadProcess, ProcessMap, ProcessMapLock
+from process import Process, ThreadProcess, getProcessMap, getProcessMapLock
