@@ -31,5 +31,15 @@ from the directory which contains this README.
 DOCUMENTATION
 
 Documentation for the Candygram package can be found in the doc/candygram
-directory.
+directory, or online at http://candygram.sourceforge.net.
 
+---------------------------------------------------------------------------
+
+FEEDBACK
+
+Please submit all bug reports, feature requests, etc. to the appropriate tracker
+at http://sourceforge.net/tracker/?group_id=114295.
+
+General discussion takes place on the candygram-discuss@lists.sourceforge.net
+mailing list. You can subscribe to this list by visiting
+http://lists.sourceforge.net/lists/listinfo/candygram-discuss.
