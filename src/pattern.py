@@ -20,7 +20,7 @@
 
 """Pattern filter generator"""
 
-__revision__ = '$Id: pattern.py,v 1.6 2004/08/20 17:30:25 hobb0001 Exp $'
+__revision__ = '$Id: pattern.py,v 1.7 2004/08/20 23:23:21 hobb0001 Exp $'
 
 
 import types
@@ -43,13 +43,13 @@ def genFilter(pattern):
 	elif callable(pattern):
 		result = genFuncFilter(pattern)
 	elif pattern is Any:
-		result = genAnyFilter(pattern)
+		result = genAnyFilter()
 	else:
 		result = genValueFilter(pattern)
 	return result
 
 
-def genAnyFilter(unused):
+def genAnyFilter():
 	"""gen filter for Any"""
 	return lambda x: True
 
