@@ -20,7 +20,7 @@
 
 """Process classes"""
 
-__revision__ = '$Id: process.py,v 1.5 2004/08/19 23:18:02 hobb0001 Exp $'
+__revision__ = '$Id: process.py,v 1.6 2004/08/20 21:00:53 hobb0001 Exp $'
 
 
 import atexit
@@ -114,6 +114,10 @@ class Process:
 
 	def _exit(self, exitError):
 		"""signal that process has terminated"""
+		assert isinstance(exitError, ExitError)
+		# Don't propogate a 'kill' signal; change the reason to 'killed' instead.
+		if exitError.reason == 'kill':
+			exitError.reason = 'killed'
 		self.__alive = False
 		self.__linksLock.acquire()
 		links = self.__links.values()
