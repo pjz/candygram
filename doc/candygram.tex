@@ -50,6 +50,7 @@ identical to those in the Erlang language.
 
 
 
+% ############################################################################
 \section{Download}
 
 \ulink{Download}{http://sourceforge.net/project/showfiles.php?group_id=114295}
@@ -58,6 +59,7 @@ Documentation is also available in PDF.
 
 
 
+% ############################################################################
 \section{Overview}
 
 \begin{notice}[note]
@@ -107,7 +109,9 @@ and sections 7.2, 7.3, and 7.5 of that book.
 
 
 
+% ############################################################################
 \section{Receiver Patterns}
+\label{patterns}
 
 \newcommand{\addhandler}{\method{addHandler()}}
 
@@ -179,6 +183,7 @@ contains Python values that would not match the pattern.
 
 
 
+% ############################################################################
 \section{The \module{candygram} module}
 
 \declaremodule{extension}{candygram}
@@ -196,6 +201,8 @@ or
 \end{verbatim}
 
 
+
+% ----------------------------------------------------------------------------
 \subsection{Functions}
 
 \begin{funcdesc}{spawn}{func\optional{, args\moreargs}}
@@ -306,6 +313,7 @@ processes. Application processes should normally not trap exits.
 
 
 
+% ----------------------------------------------------------------------------
 \subsection{Process Objects}
 
 \begin{classdesc}{Process}{}
@@ -348,13 +356,24 @@ syntax. In Erlang, messages are sent using the `!' primitive. For example:
 
 
 
+% ----------------------------------------------------------------------------
 \subsection{Receiver Objects}
 \label{Receiver}
 
 \begin{classdesc}{Receiver}{}
-% TODO: review documentation for send() and make sure this discription ties-in
-% well with that documentation.
-Some stuff about Receiver.
+Retrieves messages from a process's mailbox. Every process maintains a mailbox,
+which contains messages that have been sent to it via the \method{send()}
+method. To retreive the messages out of the mailbox, a process must use a
+\class{Receiver} object. Like the \keyword{receive} statement in Erlang, a
+\class{Receiver} object will match an incoming message against multiple patterns
+[\ref{patterns}] and will then invoke the callback function that is associated
+with the matching pattern.
+
+A single \class{Receiver} instance may not be used across multiple processes.
+The \class{Receiver} will raise an \exception{AssertionError} if one of its
+methods is invoked from a process other than the one that created it. Care
+should be taken, therefore, to make sure that a \class{Receiver} is created
+within the process that will be using it.
 
 \begin{methoddesc}{addHandler}{pattern\optional{, func\optional{, \moreargs}}}
 
@@ -375,6 +394,7 @@ parameter is replaced with the message that was received.
 
 
 
+% ----------------------------------------------------------------------------
 \subsection{Constants}
 
 \begin{datadesc}{Any}
@@ -388,6 +408,7 @@ parameter is replaced with the message that was received.
 
 
 
+% ----------------------------------------------------------------------------
 \subsection{Exceptions}
 
 \begin{excdesc}{ExitError}
@@ -395,6 +416,7 @@ parameter is replaced with the message that was received.
 
 
 
+% ############################################################################
 \section{Examples}
 
 \begin{verbatim}
@@ -412,6 +434,7 @@ parameter is replaced with the message that was received.
 \end{verbatim}
 
 
+% ############################################################################
 \section{FAQ}
 
 \subsection{Why is the package called Candygram?}
@@ -431,12 +454,14 @@ wrong; the name Candygram is correctly pronounced ``throat warbler mangrove.''
 
 
 
+% ############################################################################
 \section{Feedback}
 
 Please submit bugs here
 
 
 
+% ############################################################################
 \appendix
 \section{GNU Free Documentation License}
 \label{fdl}
@@ -444,5 +469,6 @@ Please submit bugs here
 
 
 
+% ############################################################################
 \input{candygram.ind}
 \end{document}
