@@ -29,8 +29,8 @@ def main():
 	# instead of whatever is installed in site-packages.
 	loadCandygram(pwd)
 	# Locate all test modules in this script's directory.
-	tests = glob.glob(os.path.join(pwd, 'test_*.py'))
-	tests = [os.path.basename(file)[:-3] for file in tests]
+	testFiles = glob.glob(os.path.join(pwd, 'test_*.py'))
+	tests = [os.path.basename(file)[:-3] for file in testFiles]
 	# Explicitly add this script's directory to sys.path so that we can import the
 	# tests as modules.
 	sys.path.insert(0, pwd)
