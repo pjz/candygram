@@ -2,13 +2,17 @@
 # program_5.4.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 def timeout(time, alarm):
 	return spawn(timer, self(), time, alarm)
 
+
 def cancel(timer):
 	return timer | (self(),'cancel')
+
 
 def timer(pid, time, alarm):
 	r = Receiver()

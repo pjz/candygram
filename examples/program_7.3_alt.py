@@ -2,19 +2,24 @@
 # program_7.3_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 demo_ = None
+
 
 def start():
 	global demo_
 	demo_ = spawn(demo)
 	return demo_
 
+
 def demo():
 	processFlag('trap_exit', True)
 	demo1 = Demo1()
 	demo1.demo1()
+
 
 class Demo1:
 	def __init__(self):
@@ -44,12 +49,15 @@ class Demo1:
 		for _ in r:
 			if self.stop:
 				break
+			# end if
 		return True
+
 
 def demonstrate_normal():
 	def func():
 		link(demo_)
 	spawn(func)
+
 
 def demonstrate_exit(what):
 	def func():
@@ -57,10 +65,12 @@ def demonstrate_exit(what):
 		exit(what)
 	spawn(func)
 
+
 def demonstrate_message(what):
 	def func():
-		demo_ | what
+		demo_.send(what)
 	spawn(func)
+
 
 def demonstrate_error():
 	def func():

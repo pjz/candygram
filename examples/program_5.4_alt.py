@@ -2,14 +2,18 @@
 # program_5.4_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 def timeout(time, alarm):
 	timer = Timer(self(), time, alarm)
 	return spawn(timer.timer)
 
+
 def cancel(timer):
 	return timer.send((self(),'cancel'))
+
 
 class Timer:
 	def __init__(self, pid, time, alarm):

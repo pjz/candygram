@@ -2,14 +2,18 @@
 # program_7.2_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 start_ = None
+
 
 def start(n):
 	global start_
 	start_ = p1(n)
 	return start_
+
 
 def p1(n):
 	next = None
@@ -21,6 +25,7 @@ def p1(n):
 		next = spawn(top.top)
 	link(next)
 	return next
+
 
 class Top:
 	def __init__(self, next, n):
@@ -39,6 +44,7 @@ class Top:
 			pass
 		return True
 
+
 class Top1:
 	def stop(self):
 		print 'Last process now exiting '
@@ -54,6 +60,7 @@ class Top1:
 		for _ in r:
 			pass
 		return True
+
 
 def test(mess):
 	return start_.send(mess)

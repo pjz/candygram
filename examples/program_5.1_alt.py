@@ -2,11 +2,14 @@
 # program_5.1_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 def start():
 	loop = Loop()
 	return spawn(loop.loop)
+
 
 class Loop:
 	def __init__(self):
@@ -20,4 +23,4 @@ class Loop:
 		r.addHandler('increment', self.increment)
 		for _ in r:
 			pass
-		pass
+		# end for

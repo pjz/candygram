@@ -2,15 +2,19 @@
 # program_5.2_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 # First the interface functions.
 def start():
 	loop = Loop()
 	return spawn(loop.loop)
 
+
 def increment(counter):
 	return counter.send('increment')
+
 
 def value(counter):
 	counter.send((self(),'value'))
@@ -18,8 +22,10 @@ def value(counter):
 	r.addHandler((counter, int), lambda msg: msg[1], Message)
 	return r.receive()
 
+
 def stop(counter):
 	return counter.send('stop')
+
 
 # The counter loop.
 class Loop:
@@ -30,9 +36,9 @@ class Loop:
 	def increment(self):
 		self.val += 1
 
-	def sendVal(self_, msg):
+	def sendVal(self, msg):
 		from_, _ = msg
-		from_.send((self(),self_.val))
+		from_.send((self_(),self.val))
 
 	def stopFunc(self):
 		self.stop = True
@@ -42,8 +48,9 @@ class Loop:
 		r.addHandler('increment', self.increment)
 		r.addHandler((Process, 'value'), self.sendVal, Message)
 		r.addHandler('stop', self.stopFunc)
-		r.addHandler(Any) # All other messages
+		r.addHandler(Any)  # All other messages
 		for _ in r:
 			if self.stop:
 				break
+			# end if
 		return True

@@ -2,19 +2,24 @@
 # program_7.2.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 start_ = None
+
 
 def start(n):
 	global start_
 	start_ = spawnLink(p1, n - 1)
 	return start_
 
+
 def p1(n):
 	if n == 0:
 		return top1()
 	return top(spawnLink(p1, n - 1),n)
+
 
 def top(next, n):
 	r = Receiver()
@@ -24,6 +29,7 @@ def top(next, n):
 		return top(next,n)
 	r[Any] = fun, Message
 	return r()
+
 
 def top1():
 	r = Receiver()
@@ -36,6 +42,7 @@ def top1():
 		return top1()
 	r[Any] = fun, Message
 	return r()
+
 
 def test(mess):
 	return start_ | mess

@@ -2,27 +2,34 @@
 # program_5.5.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 number_analyser = None
+
 
 def start():
 	global number_analyser
 	number_analyser = spawn(server, {})
 	return number_analyser
 
+
 # The interface functions.
 def add_number(seq, dest):
 	return request(('add_number',seq,dest))
 
+
 def analyse(seq):
 	return request(('analyse',seq))
+
 
 def request(req):
 	number_analyser | (self(), req)
 	r = Receiver()
 	r[number_analyser,Any] = lambda msg: msg[1], Message
 	return r()
+
 
 # The server.
 def server(analTable):

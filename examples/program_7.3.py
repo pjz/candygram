@@ -2,18 +2,23 @@
 # program_7.3.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 demo_ = None
+
 
 def start():
 	global demo_
 	demo_ = spawn(demo)
 	return demo_
 
+
 def demo():
 	processFlag('trap_exit', True)
 	return demo1()
+
 
 def demo1():
 	r = Receiver()
@@ -36,10 +41,12 @@ def demo1():
 	r[Any] = other, Message
 	return r()
 
+
 def demonstrate_normal():
 	def func():
 		link(demo_)
 	spawn(func)
+
 
 def demonstrate_exit(what):
 	def func():
@@ -47,10 +54,12 @@ def demonstrate_exit(what):
 		exit(what)
 	spawn(func)
 
+
 def demonstrate_message(what):
 	def func():
 		demo_ | what
 	spawn(func)
+
 
 def demonstrate_error():
 	def func():

@@ -2,7 +2,9 @@
 # program_5.3_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
+
 
 def s():
 	s1 = Receiver()
@@ -19,4 +21,4 @@ def s():
 	r = s1
 	while True:
 		r = r.receive()
-	pass
+	# end while

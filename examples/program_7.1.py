@@ -2,14 +2,18 @@
 # program_7.1.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 my_name = None
+
 
 def start():
 	global my_name
 	my_name = spawn(process)
 	return my_name
+
 
 def process():
 	r = Receiver()
@@ -19,7 +23,7 @@ def process():
 			return True
 		else:
 			exit('normal')
-		pass
+		# end if
 	r['stop', Any] = stop, Message
 	r[Any] = process
 	return r()

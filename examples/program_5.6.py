@@ -2,9 +2,12 @@
 # program_5.6.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 resource_alloc = None
+
 
 def start(resources):
 	global resource_alloc
@@ -12,18 +15,22 @@ def start(resources):
 	resource_alloc = pid
 	return pid
 
+
 # The interface functions.
 def allocate():
 	return request('alloc')
 
+
 def free(resource):
 	return request(('free',resource))
+
 
 def request(req):
 	resource_alloc | (self(),req)
 	r = Receiver()
 	r[resource_alloc,Any] = lambda msg: msg[1], Message
 	return r()
+
 
 # The server.
 def server(free, allocated):
@@ -32,15 +39,17 @@ def server(free, allocated):
 	r[Process,('free',Any)] = free_, free, allocated, Message
 	return r()
 
+
 def allocate_(free, allocated, msg):
 	from_, _ = msg
-	if len(free) > 0:
+	if free:
 		r, free = free[0], free[1:]
 		from_ | (resource_alloc,('yes',r))
 		allocated.insert(0, (r,from_))
 		return server(free, allocated)
 	from_ | (resource_alloc,'no')
 	return server([], allocated)
+
 
 def free_(free, allocated, msg):
 	from_, (_, r) = msg
@@ -52,4 +61,4 @@ def free_(free, allocated, msg):
 	else:
 		from_ | (resource_alloc,'error')
 		return server(free, allocated)
-	pass
+	# end if

@@ -2,15 +2,19 @@
 # program_7.1_alt.py, and place it into the public domain.
 #   -- Michael Hobbs
 
+
 from candygram import *
 
+
 my_name = None
+
 
 def start():
 	global my_name
 	process = Process()
 	my_name = spawn(process.process)
 	return my_name
+
 
 class Process:
 	def __init__(self):
@@ -22,7 +26,7 @@ class Process:
 			self.stop = True
 		else:
 			exit('normal')
-		pass
+		# end if
 
 	def process():
 		r = Receiver()
@@ -31,4 +35,5 @@ class Process:
 		for _ in r:
 			if self.stop:
 				break
+			# end if
 		return True
