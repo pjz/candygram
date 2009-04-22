@@ -28,6 +28,10 @@ import thread
 
 # If we ever use a different implementation (like, say, stackless) use an
 # environment variable to specify which implementation, a la pychecker.
+# 
+# I strongly disagree :-) We should instead use a parameter passed to a
+# (e.g., in a constructor or function) that takes a sensible defualt but offers
+# the library user with the option of providing other supported "backends."
 getCurrentThread = thread.get_ident
 startThread = thread.start_new_thread
 allocateLock = thread.allocate_lock
