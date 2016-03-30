@@ -24,15 +24,11 @@ __revision__ = '$Id: pattern.py,v 1.9 2004/09/03 17:06:46 hobb0001 Exp $'
 
 
 import types
-import warnings
 
 
 # Generate a unique value for 'Any' so that it won't ever be confused with any
 # other value.
 Any = object()
-# WARNING! WARNING! WARNING! AnyRemaining has been deprecated. Do not use it.
-AnyRemaining = object()
-
 
 def genFilter(pattern):
 	"""generate a pattern filter"""
@@ -45,13 +41,6 @@ def genFilter(pattern):
 	elif callable(pattern):
 		result = genFuncFilter(pattern)
 	elif pattern is Any:
-		result = genAnyFilter()
-	elif pattern is AnyRemaining:
-		warnings.warn(
-				'The candygram.AnyRemaining constant is deprecated. ' \
-				'Please use a standard list pattern instead.',
-				DeprecationWarning,
-				5)  # Usually called from addHandler(genFilter(genSeqFilter(...)))
 		result = genAnyFilter()
 	else:
 		result = genValueFilter(pattern)
