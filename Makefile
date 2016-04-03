@@ -10,5 +10,9 @@ env:
 test: env
 	./env/bin/python test/runner.py
 
-.PHONY: test default
+clean:
+	rm -rf env dist *.egg-info
+	find . -name \*.pyc | xargs rm 
+
+.PHONY: test default clean
 
