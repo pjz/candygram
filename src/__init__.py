@@ -27,7 +27,7 @@ from candygram.main import spawn, spawnLink, self, self_, exit, link, unlink, \
 		processFlag, processes, isProcessAlive, send, ExitError
 from candygram.process import Process
 from candygram.receiver import Receiver, Message
-from candygram.pattern import Any, AnyRemaining
+from candygram.pattern import Any
 
 
 __all__ = ['spawn', 'spawnLink', 'self', 'self_', 'exit', 'link', 'unlink',
