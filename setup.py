@@ -3,7 +3,7 @@
 #   -- Michael Hobbs
 
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from glob import glob
 
 
@@ -40,11 +40,11 @@ setup(name = 'Candygram',
 				'Topic :: Software Development :: Libraries :: Python Modules'],
 		download_url = 'http://sourceforge.net/project/showfiles.php?' \
 				'group_id=114295&package_id=123762&release_id=276784',
-		package_dir = {PACKAGE: 'src'},
-		packages = [PACKAGE],
+		packages = find_packages(),
 		data_files = [
                 (PACKAGE+'/examples', glob('examples/*.py')),
 				(PACKAGE+'/docs', glob('doc/candygram/*')),
 				(PACKAGE, ['COPYING', 'ChangeLog'])
-        ]
+        ],
+        extras_require = { 'tests': [ 'pytest', 'pytest-timeout', 'pytest-cov' ] }
       )

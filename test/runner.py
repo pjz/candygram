@@ -6,38 +6,8 @@ import os
 import glob
 import unittest
 
-
-def loadCandygram(pwd):
-	# Add the parent directory to sys.path so that we can import src
-	parent = os.path.dirname(pwd)
-	sys.path.insert(0, parent)
-	# Import src and then rename it to 'candygram' in sys.modules
-	#
-	# Importing src causes src/__init__.py to import a bunch of candygram.*
-	# modules before we are able to redefine the candygram package. We therefore
-	# need to remove these modules, redefine src as candygram, and then reload
-	# src.
-	try:
-		import src
-	except ImportError:
-		# 'import src' will fail if src/__init__.py cannot find the 'candygram'
-		# package installed anywhere, which will be the case if candygram hasn't
-		# been installed yet. Even though the import fails, sys.modules will still
-		# have an entry for 'src'. We use that entry to define `src' here.
-		src = sys.modules['src']
-	for module in sys.modules.keys():
-		if module.startswith('candygram'):
-			del sys.modules[module]
-		# end if
-	sys.modules['candygram'] = src
-	reload(src)
-
-
 def main():
 	pwd = os.path.dirname(os.path.abspath(sys.argv[0]))
-	# Load the development version of Candygram so that unit test will use it,
-	# instead of whatever is installed in site-packages.
-	loadCandygram(pwd)
 	# Locate all test modules in this script's directory.
 	testFiles = glob.glob(os.path.join(pwd, 'test_*.py'))
 	tests = [os.path.basename(file)[:-3] for file in testFiles]
