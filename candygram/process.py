@@ -23,9 +23,10 @@
 __revision__ = "$Id: process.py,v 1.16 2004/09/13 20:11:58 hobb0001 Exp $"
 
 
-import atexit
 import sys
+import atexit
 import weakref
+from contextlib import contextmanager
 
 from candygram.main import ExitError, _checkSignal
 from candygram.threadimpl import allocateLock, startThread, getCurrentThread
@@ -67,10 +68,9 @@ class Process:
         _checkSignal()
         if not self.isAlive():
             return message
-        self._mailboxCondition.acquire()
-        self._mailbox.append(message)
-        self._mailboxCondition.notify()
-        self._mailboxCondition.release()
+        with self._mailboxCondition:
+            self._mailbox.append(message)
+            self._mailboxCondition.notify()
         return message
 
     __or__ = send
@@ -84,8 +84,7 @@ class Process:
         assert signal.proc is not self
         if not self.isAlive():
             return
-        self.__signalLock.acquire()
-        try:
+        with self.__signalLock:
             if self.__trapExit and signal.reason != "kill":
                 self.send(("EXIT", signal.proc, signal.reason))
                 return
@@ -94,13 +93,9 @@ class Process:
             elif self.__signal is None:
                 self.__signal = signal
                 self.__signalSet = True
-            # end if
-        finally:
-            self.__signalLock.release()
         # Wake up process if it is waiting on a receive().
-        self._mailboxCondition.acquire()
-        self._mailboxCondition.notify()
-        self._mailboxCondition.release()
+        with self._mailboxCondition:
+            self._mailboxCondition.notify()
 
     def _addLink(self, proc):
         """link a proc with this process"""
@@ -109,41 +104,36 @@ class Process:
             return
         if proc is self:
             return
-        self.__linksLock.acquire()
-        self.__links[id(proc)] = proc
-        self.__linksLock.release()
+        with self.__linksLock:
+            self.__links[id(proc)] = proc
 
     def _removeLink(self, proc):
         """remove link to proc from this process"""
         procId = id(proc)
-        self.__linksLock.acquire()
-        if procId in self.__links:
-            del self.__links[procId]
-        self.__linksLock.release()
+        with self.__linksLock:
+            if procId in self.__links:
+                del self.__links[procId]
 
     def _addReceiver(self, receiver):
         """register a new receiver with this process"""
-        self._mailboxCondition.acquire()
-        # We don't want the __receiverRefs list to prevent garbage collection of
-        # the receiver.
-        self.__receiverRefs.append(weakref.ref(receiver, self._removeReceiverRef))
-        self._mailboxCondition.release()
+        with self._mailboxCondition:
+            # We don't want the __receiverRefs list to prevent garbage collection of
+            # the receiver.
+            self.__receiverRefs.append(weakref.ref(receiver, self._removeReceiverRef))
 
     def _removeReceiver(self, receiver):
         """unregister receiver from this process"""
-        self._mailboxCondition.acquire()
-        for i in range(len(self.__receiverRefs)):
-            if self.__receiverRefs[i]() is receiver:
-                del self.__receiverRefs[i]
-                break
-            # end if
-        self._mailboxCondition.release()
+        with self._mailboxCondition:
+            for i in range(len(self.__receiverRefs)):
+                if self.__receiverRefs[i]() is receiver:
+                    del self.__receiverRefs[i]
+                    break
+                # end if
 
     def _removeReceiverRef(self, ref):
         """called when no more [strong] references to a registered receiver"""
-        self._mailboxCondition.acquire()
-        self.__receiverRefs.remove(ref)
-        self._mailboxCondition.release()
+        with self._mailboxCondition:
+            self.__receiverRefs.remove(ref)
 
     def _getReceivers(self):
         """return list of registered receivers"""
@@ -165,9 +155,8 @@ class Process:
         if exitError.reason == "kill":
             exitError.reason = "killed"
         self.__alive = False
-        self.__linksLock.acquire()
-        links = list(self.__links.values())
-        self.__linksLock.release()
+        with self.__linksLock:
+            links = list(self.__links.values())
         for proc in links:
             proc._removeLink(self)
             proc._signal(exitError)
@@ -178,10 +167,9 @@ class Process:
         if flag == "trap_exit":
             if not isinstance(value, bool):
                 raise ExitError("badarg")
-            self.__signalLock.acquire()
-            result = self.__trapExit
-            self.__trapExit = value
-            self.__signalLock.release()
+            with self.__signalLock:
+                result = self.__trapExit
+                self.__trapExit = value
             return result
         else:
             raise ExitError("badarg")
@@ -194,11 +182,10 @@ class Process:
         # if a signal has been set much more quickly.
         if not self.__signalSet:
             return
-        self.__signalLock.acquire()
-        signal = self.__signal
-        self.__signal = None
-        self.__signalSet = False
-        self.__signalLock.release()
+        with self.__signalLock:
+            signal = self.__signal
+            self.__signal = None
+            self.__signalSet = False
         self._raise(signal)
 
     def _raise(self, signal):
@@ -213,9 +200,8 @@ class Process:
     def __run(self, func, args, kwargs):
         """main function of thread"""
         currentThread = getCurrentThread()
-        getProcessMapLock().acquire()
-        getProcessMap()[currentThread] = self
-        getProcessMapLock().release()
+        with ProcessMap() as pm:
+            pm[currentThread] = self
         exitError = ExitError("normal", self)
         try:
             func(*args, **kwargs)
@@ -224,9 +210,8 @@ class Process:
         except:
             exitError = ExitError(ExceptionReason(), self)
         self._exit(exitError)
-        getProcessMapLock().acquire()
-        del getProcessMap()[currentThread]
-        getProcessMapLock().release()
+        with ProcessMap() as pm:
+            del pm[currentThread]
 
 
 class RootProcess(Process):
@@ -272,18 +257,13 @@ class ExceptionReason:
 _ProcessMap = None
 _ProcessMapLock = None
 
-
-def getProcessMap():
-    """return value of ProcessMap"""
-    global _ProcessMap
-    if _ProcessMap is None:
-        _ProcessMap = {getCurrentThread(): RootProcess()}
-    return _ProcessMap
-
-
-def getProcessMapLock():
-    """return value of ProcessMapLock"""
-    global _ProcessMapLock
+@contextmanager
+def ProcessMap():
+    global _ProcessMap, _ProcessMapLock
     if _ProcessMapLock is None:
         _ProcessMapLock = allocateLock()
-    return _ProcessMapLock
+    with _ProcessMapLock:
+        if _ProcessMap is None:
+            _ProcessMap = { getCurrentThread(): RootProcess() }
+        yield _ProcessMap
+

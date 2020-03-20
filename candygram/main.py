@@ -56,15 +56,10 @@ def self(noCheck=False):
     # don't call _checkSignal() if noCheck is set.
     if not noCheck:
         _checkSignal()
-    getProcessMapLock().acquire()
-    try:
+    with ProcessMap() as pm:
         currentThread = getCurrentThread()
-        assert (
-            currentThread in getProcessMap()
-        ), "Only the main thread or threads created by spawn*() may invoke self()"
-        result = getProcessMap()[currentThread]
-    finally:
-        getProcessMapLock().release()
+        assert currentThread in pm, "Only the main thread or threads created by spawn*() may invoke self()"
+        result = pm[currentThread]
     return result
 
 
@@ -119,12 +114,8 @@ def processFlag(flag, value):
 def processes():
     """list all active processes"""
     _checkSignal()
-    getProcessMapLock().acquire()
-    try:
-        return list(getProcessMap().values())
-    finally:
-        getProcessMapLock().release()
-    # end try
+    with ProcessMap() as pm:
+        return list(pm.values())
 
 
 def isProcessAlive(proc):
@@ -161,4 +152,4 @@ class ExitError(Exception):
 
 
 # We can't import these at the top, since the process module imports this one
-from candygram.process import Process, getProcessMap, getProcessMapLock
+from candygram.process import Process, ProcessMap
