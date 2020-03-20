@@ -6,6 +6,7 @@ import os
 import time
 import sys
 import io
+import random
 
 import candygram as cg
 import pytest
@@ -16,9 +17,8 @@ PAUSE = 0.15  # seconds
 
 def wait_for(pred):
     while not pred():
-        time.sleep(PAUSE)
+        time.sleep((1+random.random())*PAUSE)
     time.sleep(PAUSE)
-
 
 class TestExamplePrograms(unittest.TestCase):
     def setUp(self):
@@ -198,6 +198,7 @@ class TestExamplePrograms(unittest.TestCase):
     def testProgram_7_3(self):
         def test(dict):
             proc = dict["start"]()
+            wait_for(proc.isAlive)
             normal = dict["demonstrate_normal"]()
             wait_for(lambda: not normal.isAlive())
             assert not normal.isAlive()

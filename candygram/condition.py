@@ -74,7 +74,12 @@ class Condition:
         if self.__waiter is not None:
             self.__waiter.release()
             self.__waiter = None
-        # end if
+
+    def __enter__(self):
+        self.__lock.acquire()
+
+    def __exit__(self, *a):
+        self.__lock.release()
 
 
 def _acquire(lock, timeout):
