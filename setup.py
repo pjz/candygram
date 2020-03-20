@@ -12,7 +12,7 @@ PACKAGE = "candygram"
 
 setup(
     name="Candygram",
-    version="1.0.1",
+    version="3.0.0",
     license="GNU Lesser General Public License",
     url="http://candygram.sourceforge.net",
     author="Michael Hobbs",
@@ -37,7 +37,8 @@ setup(
         "Operating System :: OS Independent",
         "Operating System :: POSIX",
         "Programming Language :: Erlang",
-        "Programming Language :: Python",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: Only",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     download_url="http://sourceforge.net/project/showfiles.php?"

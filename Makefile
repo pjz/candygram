@@ -1,5 +1,5 @@
 
-PYTHON=python
+PYTHON=python3
 
 default:
 	@echo "make env  - make a virtualenv under ./env"
