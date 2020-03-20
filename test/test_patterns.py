@@ -16,11 +16,11 @@ class TestPatterns(unittest.TestCase):
 
     def assertMatch(self, value):
         cg.self().send(value)
-        self.assertEqual(self.r.receive(), "match")
+        assert self.r.receive() == "match"
 
     def assertNonMatch(self, value):
         cg.self().send(value)
-        self.assertEqual(self.r.receive(), "non-match")
+        assert self.r.receive() == "non-match"
 
     def testAny(self):
         self.setPattern(cg.Any)

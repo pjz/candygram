@@ -31,9 +31,7 @@ class TestDocExample(unittest.TestCase):
         time.sleep(1)
         exit(proc, "kill")
         # Assert print statements worked as advertised
-        self.assertEqual(
-            self.out.getvalue(), "Go Away land shark\n" "Hello candygram\n"
-        )
+        assert self.out.getvalue() == "Go Away land shark\n" "Hello candygram\n"
 
     def test2(self):
         import candygram as cg
@@ -59,9 +57,7 @@ class TestDocExample(unittest.TestCase):
         time.sleep(1)
         cg.exit(proc, "kill")
         # Assert print statements worked as advertised
-        self.assertEqual(
-            self.out.getvalue(), "Go Away land shark\n" "Hello candygram\n"
-        )
+        assert self.out.getvalue() == "Go Away land shark\n" "Hello candygram\n"
 
     def test3(self):
         import time
@@ -94,8 +90,6 @@ class TestDocExample(unittest.TestCase):
         exit(a, "kill")
         exit(b, "kill")
         # Assert print statements worked as advertised
-        self.assertEqual(
-            self.out.getvalue(),
-            "A received: Girl Scout cookies\n"
-            "A received: The meaning of life is: 42\n",
-        )
+        assert self.out.getvalue() == \
+            "A received: Girl Scout cookies\n" \
+            "A received: The meaning of life is: 42\n"

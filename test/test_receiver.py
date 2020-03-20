@@ -4,6 +4,7 @@
 import unittest
 
 import candygram as cg
+import pytest
 
 
 class TestReceiver(unittest.TestCase):
@@ -26,7 +27,7 @@ class TestReceiver(unittest.TestCase):
         proc.send(1)
         r = cg.Receiver()
         r.addHandler("one", lambda: "success")
-        self.assertEqual(r.receive(1000), "success")
+        assert r.receive(1000) == "success"
         cg.exit(proc, "kill")
 
     def testMultiProc(self):
@@ -38,11 +39,11 @@ class TestReceiver(unittest.TestCase):
         proc2.send(1)
         r = cg.Receiver()
         r.addHandler("one", lambda: "success")
-        self.assertEqual(r.receive(1000), "success")
-        self.assertEqual(r.receive(1000), "success")
+        assert r.receive(1000) == "success"
+        assert r.receive(1000) == "success"
         proc3 = cg.spawn(self.receive, r1)
         proc3.send(1)
-        self.assertEqual(r.receive(1000), "success")
+        assert r.receive(1000) == "success"
         cg.exit(proc1, "kill")
         cg.exit(proc2, "kill")
         cg.exit(proc3, "kill")
@@ -57,10 +58,10 @@ class TestReceiver(unittest.TestCase):
         proc1.send(1)
         r = cg.Receiver()
         r.addHandler("one", lambda: "success")
-        self.assertEqual(r.receive(1000), "success")
+        assert r.receive(1000) == "success"
         proc2 = cg.spawn(self.receive, r1)
         proc2.send(1)
-        self.assertEqual(r.receive(1000), "success")
+        assert r.receive(1000) == "success"
         cg.exit(proc1, "kill")
         cg.exit(proc2, "kill")
 
@@ -69,14 +70,15 @@ class TestReceiver(unittest.TestCase):
         ref1 = r.addHandler(1)
         ref2 = r.addHandler(2)
         ref3 = r.addHandler(3)
-        self.assert_(len(r._Receiver__handlers), 3)
+        assert len(r._Receiver__handlers), 3
         cg.self().send(2)
-        self.assertEqual(r.receive(0, lambda: "to"), None)
+        assert r.receive(0, lambda: "to") == None
         r.removeHandler(ref2)
-        self.assert_(len(r._Receiver__handlers), 2)
+        assert len(r._Receiver__handlers), 2
         cg.self().send(2)
-        self.assertEqual(r.receive(0, lambda: "to"), "to")
-        self.assertRaises(cg.ExitError, r.removeHandler, ref2)
+        assert r.receive(0, lambda: "to") == "to"
+        with pytest.raises(cg.ExitError):
+            r.removeHandler(ref2)
 
     def testRemoveHandlers(self):
         r1 = cg.Receiver()
@@ -88,11 +90,12 @@ class TestReceiver(unittest.TestCase):
         r2.addHandler(5)
         r2.addHandler(6)
         refs = r2.addHandlers(r1)
-        self.assert_(len(r2._Receiver__handlers), 6)
+        assert len(r2._Receiver__handlers), 6
         cg.self().send(2)
-        self.assertEqual(r2.receive(0, lambda: "to"), None)
+        assert r2.receive(0, lambda: "to") == None
         r2.removeHandler(refs[1])
-        self.assert_(len(r2._Receiver__handlers), 5)
+        assert len(r2._Receiver__handlers), 5
         cg.self().send(2)
-        self.assertEqual(r2.receive(0, lambda: "to"), "to")
-        self.assertRaises(cg.ExitError, r2.removeHandler, refs[1])
+        assert r2.receive(0, lambda: "to") == "to"
+        with pytest.raises(cg.ExitError):
+            r2.removeHandler(refs[1])
