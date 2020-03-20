@@ -47,118 +47,118 @@ from candygram import *
 
 
 class SlidingWindow:
-	
-	"""The sliding window class.
+
+    """The sliding window class.
 
 	Standard usage is swProc = SlidingWindow().spawn()
 	The process never terminates naturally. In order to stop it, call
 	exit(swProc, 'kill')
 	"""
 
-	def __init__(self):
-		# Contains (currentSize, maxSize) tuples for windows of each known receiver 
-		# process.
-		self.__sizes = {}
-		# Contains [sender] list for sender processes waiting for an acknowledgement
-		# from a receiver process.
-		self.__waiters = {}
-		# Set to True after the process has been spawned.
-		self.__running = False
+    def __init__(self):
+        # Contains (currentSize, maxSize) tuples for windows of each known receiver
+        # process.
+        self.__sizes = {}
+        # Contains [sender] list for sender processes waiting for an acknowledgement
+        # from a receiver process.
+        self.__waiters = {}
+        # Set to True after the process has been spawned.
+        self.__running = False
 
-	def spawn(self):
-		assert not self.__running, 'This SlidingWindow has already been spawned'
-		self.__running = True
-		return spawn(self.__run)
+    def spawn(self):
+        assert not self.__running, "This SlidingWindow has already been spawned"
+        self.__running = True
+        return spawn(self.__run)
 
-	def spawnLink(self):
-		assert not self.__running, 'This SlidingWindow has already been spawned'
-		self.__running = True
-		return spawnLink(self.__run)
+    def spawnLink(self):
+        assert not self.__running, "This SlidingWindow has already been spawned"
+        self.__running = True
+        return spawnLink(self.__run)
 
-	def __run(self):
-		processFlag('trap_exit', True)
-		r = Receiver()
-		r['set_size', Process, int] = self.__setMaxSize, Message
-		r['get_size', Process, Process] = self.__getSize, Message
-		r['EXIT', Process, Any] = self.__exit, Message
-		r['ack', Process] = self.__ack, Message
-		r[Process, Process, Any] = self.__send, Message
-		r[Any]  # ignore spurrious messages
-		for _ in r:
-			pass
-		# end for
+    def __run(self):
+        processFlag("trap_exit", True)
+        r = Receiver()
+        r["set_size", Process, int] = self.__setMaxSize, Message
+        r["get_size", Process, Process] = self.__getSize, Message
+        r["EXIT", Process, Any] = self.__exit, Message
+        r["ack", Process] = self.__ack, Message
+        r[Process, Process, Any] = self.__send, Message
+        r[Any]  # ignore spurrious messages
+        for _ in r:
+            pass
+        # end for
 
-	def __setMaxSize(self, message):
-		_, receiver, maxSize = message
-		# Reset the maxSize value in receiver's size tuple.
-		recvId = id(receiver)
-		size = self.__sizes.get(recvId, (0, 0))[0]
-		self.__sizes[recvId] = (size, maxSize)
-		# We want to know when the receiver exits, so that we can clear its entry
-		# from self.__sizes when it goes away.
-		link(receiver)
+    def __setMaxSize(self, message):
+        _, receiver, maxSize = message
+        # Reset the maxSize value in receiver's size tuple.
+        recvId = id(receiver)
+        size = self.__sizes.get(recvId, (0, 0))[0]
+        self.__sizes[recvId] = (size, maxSize)
+        # We want to know when the receiver exits, so that we can clear its entry
+        # from self.__sizes when it goes away.
+        link(receiver)
 
-	def __getSize(self, message):
-		_, receiver, proc = message
-		# Retrieve the maxSize value from receiver's size tuple.
-		recvId = id(receiver)
-		size = self.__sizes.get(recvId, (0, 0))[0]
-		proc | (self_(), 'size', size)
+    def __getSize(self, message):
+        _, receiver, proc = message
+        # Retrieve the maxSize value from receiver's size tuple.
+        recvId = id(receiver)
+        size = self.__sizes.get(recvId, (0, 0))[0]
+        proc | (self_(), "size", size)
 
-	def __exit(self, message):
-		_, receiver, _ = message
-		# A process has terminated, delete all references to it from our dicts.
-		recvId = id(receiver)
-		assert recvId in self.__sizes
-		del self.__sizes[recvId]
-		if recvId in self.__waiters:
-			del self.__waiters[recvId]
-		# end if
+    def __exit(self, message):
+        _, receiver, _ = message
+        # A process has terminated, delete all references to it from our dicts.
+        recvId = id(receiver)
+        assert recvId in self.__sizes
+        del self.__sizes[recvId]
+        if recvId in self.__waiters:
+            del self.__waiters[recvId]
+        # end if
 
-	def __ack(self, message):
-		receiver = message[1]
-		# Lookup current window size of receiver.
-		recvId = id(receiver)
-		assert recvId in self.__sizes
-		size, maxSize = self.__sizes[recvId]
-		# If there are any senders are waiting for acknowledgement from this 
-		# receiver, then the receiver's window should be full. (Otherwise the
-		# acknowledgement would have already been sent to the sender.)
-		if recvId in self.__waiters:
-			# Sanity check to make sure that the window is full:
-			assert size == maxSize
-			waiters = self.__waiters[recvId]
-			sender, message = waiters.pop(0)
-			if not waiters:
-				# clean up empty dictionary entries
-				del self.__waiters[recvId]
-			receiver | message
-			sender | ('ack', receiver)
-		else:
-			# Sanity check to make sure that the process isn't acknowledging when its
-			# window is empty:
-			assert size > 0
-			self.__sizes[recvId] = (size - 1, maxSize)
-		# end if
+    def __ack(self, message):
+        receiver = message[1]
+        # Lookup current window size of receiver.
+        recvId = id(receiver)
+        assert recvId in self.__sizes
+        size, maxSize = self.__sizes[recvId]
+        # If there are any senders are waiting for acknowledgement from this
+        # receiver, then the receiver's window should be full. (Otherwise the
+        # acknowledgement would have already been sent to the sender.)
+        if recvId in self.__waiters:
+            # Sanity check to make sure that the window is full:
+            assert size == maxSize
+            waiters = self.__waiters[recvId]
+            sender, message = waiters.pop(0)
+            if not waiters:
+                # clean up empty dictionary entries
+                del self.__waiters[recvId]
+            receiver | message
+            sender | ("ack", receiver)
+        else:
+            # Sanity check to make sure that the process isn't acknowledging when its
+            # window is empty:
+            assert size > 0
+            self.__sizes[recvId] = (size - 1, maxSize)
+        # end if
 
-	def __send(self, message):
-		sender, dest, message = message
-		destId = id(dest)
-		# Define a new window with a default maxSize of 1 if we haven't already
-		# encoutered this receiver process.
-		if destId not in self.__sizes:
-			self.__setMaxSize((None, dest, 1))
-		size, maxSize = self.__sizes[destId]
-		# If the receiver's window is full, add current sender to the queue of
-		# senders that are waiting for an acknowledgement from the receiver. If the
-		# receiver's window is not full, send an acknowledgement back to the sender
-		# right away.
-		if size == maxSize:
-			self.__waiters.setdefault(destId, []).append((sender, message))
-		else:
-			# Sanity check to make sure size hasn't somehow exceeded maxSize:
-			assert size < maxSize
-			dest | message
-			sender | ('ack', dest)
-			self.__sizes[destId] = (size + 1, maxSize)
-		# end if
+    def __send(self, message):
+        sender, dest, message = message
+        destId = id(dest)
+        # Define a new window with a default maxSize of 1 if we haven't already
+        # encoutered this receiver process.
+        if destId not in self.__sizes:
+            self.__setMaxSize((None, dest, 1))
+        size, maxSize = self.__sizes[destId]
+        # If the receiver's window is full, add current sender to the queue of
+        # senders that are waiting for an acknowledgement from the receiver. If the
+        # receiver's window is not full, send an acknowledgement back to the sender
+        # right away.
+        if size == maxSize:
+            self.__waiters.setdefault(destId, []).append((sender, message))
+        else:
+            # Sanity check to make sure size hasn't somehow exceeded maxSize:
+            assert size < maxSize
+            dest | message
+            sender | ("ack", dest)
+            self.__sizes[destId] = (size + 1, maxSize)
+        # end if

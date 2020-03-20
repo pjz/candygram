@@ -20,7 +20,7 @@
 
 """Pattern filter generator"""
 
-__revision__ = '$Id: pattern.py,v 1.9 2004/09/03 17:06:46 hobb0001 Exp $'
+__revision__ = "$Id: pattern.py,v 1.9 2004/09/03 17:06:46 hobb0001 Exp $"
 
 
 import types
@@ -30,86 +30,91 @@ import types
 # other value.
 Any = object()
 
+
 def genFilter(pattern):
-	"""generate a pattern filter"""
-	if isinstance(pattern, tuple) or isinstance(pattern, list):
-		result = genSeqFilter(pattern)
-	elif isinstance(pattern, dict):
-		result = genDictFilter(pattern)
-	elif isinstance(pattern, type) or type(pattern) is types.ClassType:
-		result = genTypeFilter(pattern)
-	elif callable(pattern):
-		result = genFuncFilter(pattern)
-	elif pattern is Any:
-		result = genAnyFilter()
-	else:
-		result = genValueFilter(pattern)
-	return result
+    """generate a pattern filter"""
+    if isinstance(pattern, tuple) or isinstance(pattern, list):
+        result = genSeqFilter(pattern)
+    elif isinstance(pattern, dict):
+        result = genDictFilter(pattern)
+    elif isinstance(pattern, type) or type(pattern) is types.ClassType:
+        result = genTypeFilter(pattern)
+    elif callable(pattern):
+        result = genFuncFilter(pattern)
+    elif pattern is Any:
+        result = genAnyFilter()
+    else:
+        result = genValueFilter(pattern)
+    return result
 
 
 def genAnyFilter():
-	"""gen filter for Any"""
-	return lambda x: True
+    """gen filter for Any"""
+    return lambda x: True
 
 
 def genValueFilter(value):
-	"""gen filter for a specific value"""
-	return lambda x: x == value
+    """gen filter for a specific value"""
+    return lambda x: x == value
 
 
 def genFuncFilter(func):
-	"""gen filter for a function"""
-	return func
+    """gen filter for a function"""
+    return func
 
 
 def genTypeFilter(t):
-	"""gen filter for a type check"""
-	return lambda x: isinstance(x, t)
+    """gen filter for a type check"""
+    return lambda x: isinstance(x, t)
 
 
 def genSeqFilter(seq):
-	"""gen filter for a sequence pattern"""
-	# Define these values as constants outside of the filt() function so that
-	# the filter will not have to re-calculate the values every time it's called.
-	lastFilter = None
-	if isinstance(seq, list) and seq:
-		lastFilter = genFilter(seq[-1])
-		seq = seq[:-1]
-	seqType = type(seq)
-	seqLen = len(seq)
-	subFilters = [genFilter(pattern) for pattern in seq]
-	seqRange = range(seqLen)
-	def filt(x):
-		"""resulting filter function"""
-		if not isinstance(x, seqType):
-			return False
-		if len(x) < seqLen:
-			return False
-		for i in seqRange:
-			if not subFilters[i](x[i]):
-				return False
-			# end if
-		for value in x[seqLen:]:
-			# Don't allow any excess values if lastFilter hasn't been set.
-			if lastFilter is None or not lastFilter(value):
-				return False
-			# end if
-		return True
-	return filt
+    """gen filter for a sequence pattern"""
+    # Define these values as constants outside of the filt() function so that
+    # the filter will not have to re-calculate the values every time it's called.
+    lastFilter = None
+    if isinstance(seq, list) and seq:
+        lastFilter = genFilter(seq[-1])
+        seq = seq[:-1]
+    seqType = type(seq)
+    seqLen = len(seq)
+    subFilters = [genFilter(pattern) for pattern in seq]
+    seqRange = range(seqLen)
+
+    def filt(x):
+        """resulting filter function"""
+        if not isinstance(x, seqType):
+            return False
+        if len(x) < seqLen:
+            return False
+        for i in seqRange:
+            if not subFilters[i](x[i]):
+                return False
+            # end if
+        for value in x[seqLen:]:
+            # Don't allow any excess values if lastFilter hasn't been set.
+            if lastFilter is None or not lastFilter(value):
+                return False
+            # end if
+        return True
+
+    return filt
 
 
 def genDictFilter(dict_):
-	"""gen filter for a dictionary pattern"""
-	subFilters = []
-	for key, pattern in dict_.items():
-		subFilters.append((key, genFilter(pattern)))
-	def filt(x):
-		"""resulting filter function"""
-		for key, subFilter in subFilters:
-			if key not in x:
-				return False
-			if not subFilter(x[key]):
-				return False
-			# end if
-		return True
-	return filt
+    """gen filter for a dictionary pattern"""
+    subFilters = []
+    for key, pattern in dict_.items():
+        subFilters.append((key, genFilter(pattern)))
+
+    def filt(x):
+        """resulting filter function"""
+        for key, subFilter in subFilters:
+            if key not in x:
+                return False
+            if not subFilter(x[key]):
+                return False
+            # end if
+        return True
+
+    return filt

@@ -10,20 +10,22 @@ my_name = None
 
 
 def start():
-	global my_name
-	my_name = spawn(process)
-	return my_name
+    global my_name
+    my_name = spawn(process)
+    return my_name
 
 
 def process():
-	r = Receiver()
-	def stop(msg):
-		_, method = msg
-		if method == 'return':
-			return True
-		else:
-			exit('normal')
-		# end if
-	r['stop', Any] = stop, Message
-	r[Any] = process
-	return r()
+    r = Receiver()
+
+    def stop(msg):
+        _, method = msg
+        if method == "return":
+            return True
+        else:
+            exit("normal")
+        # end if
+
+    r["stop", Any] = stop, Message
+    r[Any] = process
+    return r()

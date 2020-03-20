@@ -7,14 +7,14 @@ from candygram import *
 
 
 def timeout(time, alarm):
-	return spawn(timer, self(), time, alarm)
+    return spawn(timer, self(), time, alarm)
 
 
 def cancel(timer):
-	return timer | (self(),'cancel')
+    return timer | (self(), "cancel")
 
 
 def timer(pid, time, alarm):
-	r = Receiver()
-	r[Process, 'cancel'] = lambda: True
-	return r(time, lambda: pid | alarm)
+    r = Receiver()
+    r[Process, "cancel"] = lambda: True
+    return r(time, lambda: pid | alarm)

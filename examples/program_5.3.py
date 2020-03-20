@@ -7,27 +7,27 @@ from candygram import *
 
 
 def s1():
-	r = Receiver()
-	r['msg_a'] = s2
-	r['msg_c'] = s3
-	return r()
+    r = Receiver()
+    r["msg_a"] = s2
+    r["msg_c"] = s3
+    return r()
 
 
 def s2():
-	r = Receiver()
-	r['msg_x'] = s3
-	r['msg_h'] = s4
-	return r()
+    r = Receiver()
+    r["msg_x"] = s3
+    r["msg_h"] = s4
+    return r()
 
 
 def s3():
-	r = Receiver()
-	r['msg_b'] = s1
-	r['msg_y'] = s2
-	return r()
+    r = Receiver()
+    r["msg_b"] = s1
+    r["msg_y"] = s2
+    return r()
 
 
 def s4():
-	r = Receiver()
-	r['msg_i'] = s3
-	return r()
+    r = Receiver()
+    r["msg_i"] = s3
+    return r()

@@ -36,7 +36,7 @@ simplified by making the following assumptions:
    the lock.
 """
 
-__revision__ = '$Id: condition.py,v 1.4 2004/08/19 23:18:02 hobb0001 Exp $'
+__revision__ = "$Id: condition.py,v 1.4 2004/08/19 23:18:02 hobb0001 Exp $"
 
 
 import time
@@ -46,50 +46,50 @@ from candygram.threadimpl import allocateLock
 
 class Condition:
 
-	"""modified Condition class"""
+    """modified Condition class"""
 
-	def __init__(self):
-		self.__lock = allocateLock()
-		self.acquire = self.__lock.acquire
-		self.release = self.__lock.release
-		self.locked = self.__lock.locked
-		self.__waiter = None
+    def __init__(self):
+        self.__lock = allocateLock()
+        self.acquire = self.__lock.acquire
+        self.release = self.__lock.release
+        self.locked = self.__lock.locked
+        self.__waiter = None
 
-	def wait(self, timeout=None):
-		"""wait for notify()"""
-		assert self.locked()
-		waiter = allocateLock()
-		waiter.acquire()
-		self.__waiter = waiter
-		self.release()
-		try:
-			return _acquire(waiter, timeout)
-		finally:
-			self.acquire()
-		# end try
+    def wait(self, timeout=None):
+        """wait for notify()"""
+        assert self.locked()
+        waiter = allocateLock()
+        waiter.acquire()
+        self.__waiter = waiter
+        self.release()
+        try:
+            return _acquire(waiter, timeout)
+        finally:
+            self.acquire()
+        # end try
 
-	def notify(self):
-		"""wake up wait()ers"""
-		assert self.locked()
-		if self.__waiter is not None:
-			self.__waiter.release()
-			self.__waiter = None
-		# end if
+    def notify(self):
+        """wake up wait()ers"""
+        assert self.locked()
+        if self.__waiter is not None:
+            self.__waiter.release()
+            self.__waiter = None
+        # end if
 
 
 def _acquire(lock, timeout):
-	"""try to acquire a lock, with a timeout"""
-	if timeout is None:
-		lock.acquire()
-		return True
-	timeout = time.time() + timeout
-	delay = 0.0005  # 500 us -> initial delay of 1 ms
-	while True:
-		if lock.acquire(0):
-			return True
-		remaining = timeout - time.time()
-		if remaining <= 0:
-			break
-		delay = min(delay * 2, remaining, .05)
-		time.sleep(delay)
-	return False
+    """try to acquire a lock, with a timeout"""
+    if timeout is None:
+        lock.acquire()
+        return True
+    timeout = time.time() + timeout
+    delay = 0.0005  # 500 us -> initial delay of 1 ms
+    while True:
+        if lock.acquire(0):
+            return True
+        remaining = timeout - time.time()
+        if remaining <= 0:
+            break
+        delay = min(delay * 2, remaining, 0.05)
+        time.sleep(delay)
+    return False

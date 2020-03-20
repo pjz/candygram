@@ -20,7 +20,7 @@
 
 """provides threading primitives"""
 
-__revision__ = '$Id: threadimpl.py,v 1.1 2004/08/19 23:14:50 hobb0001 Exp $'
+__revision__ = "$Id: threadimpl.py,v 1.1 2004/08/19 23:14:50 hobb0001 Exp $"
 
 
 import thread
@@ -28,7 +28,7 @@ import thread
 
 # If we ever use a different implementation (like, say, stackless) use an
 # environment variable to specify which implementation, a la pychecker.
-# 
+#
 # I strongly disagree :-) We should instead use a parameter passed to a
 # (e.g., in a constructor or function) that takes a sensible defualt but offers
 # the library user with the option of providing other supported "backends."

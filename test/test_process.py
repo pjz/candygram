@@ -12,22 +12,21 @@ import candygram as cg
 # can't really be tested as a suite. Simply comment one out below to test it
 # on the command line
 class TestExitException:
+    def exception(self):
+        raise Exception("test exception")
 
-	def exception(self):
-		raise Exception('test exception')
+    def testExit(self):
+        proc = cg.spawnLink(self.exception)
+        time.sleep(0.1)
 
-	def testExit(self):
-		proc = cg.spawnLink(self.exception)
-		time.sleep(0.1)
-
-	def testDoubleException(self):
-		with pytest.raises(Exception, match="test exception"):
-			proc = cg.spawnLink(self.exception)
-			time.sleep(0.1)
-			raise Exception('second exception')
+    def testDoubleException(self):
+        with pytest.raises(Exception, match="test exception"):
+            proc = cg.spawnLink(self.exception)
+            time.sleep(0.1)
+            raise Exception("second exception")
 
 
-if __name__ == '__main__':
-	test = TestExitException()
-	#~ test.testExit()
-	#~ test.testDoubleException()
+if __name__ == "__main__":
+    test = TestExitException()
+    # ~ test.testExit()
+    # ~ test.testDoubleException()

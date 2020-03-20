@@ -7,20 +7,20 @@ from candygram import *
 
 
 def start():
-	loop = Loop()
-	return spawn(loop.loop)
+    loop = Loop()
+    return spawn(loop.loop)
 
 
 class Loop:
-	def __init__(self):
-		self.val = 0
+    def __init__(self):
+        self.val = 0
 
-	def increment(self):
-		self.val += 1
+    def increment(self):
+        self.val += 1
 
-	def loop(self):
-		r = Receiver()
-		r.addHandler('increment', self.increment)
-		for _ in r:
-			pass
-		# end for
+    def loop(self):
+        r = Receiver()
+        r.addHandler("increment", self.increment)
+        for _ in r:
+            pass
+        # end for

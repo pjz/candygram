@@ -50,69 +50,69 @@ import candygram as cg
 
 class wxProcess(cg.Process):
 
-	"""A wxPython compatible Process class"""
+    """A wxPython compatible Process class"""
 
-	def __init__(self):
-		# Don't bind a custom notification event to wx.App at this point, since
-		# a wx.App shouldn't be instantiated yet. We bind to the wx.App, instead,
-		# when the first time send() is called.
-		cg.Process.__init__(self)
-		self.__app = None
-		self.__notifyEventType = None
-		self.receiver = cg.Receiver()
+    def __init__(self):
+        # Don't bind a custom notification event to wx.App at this point, since
+        # a wx.App shouldn't be instantiated yet. We bind to the wx.App, instead,
+        # when the first time send() is called.
+        cg.Process.__init__(self)
+        self.__app = None
+        self.__notifyEventType = None
+        self.receiver = cg.Receiver()
 
-	def send(self, message):
-		"""Send message to the process and then send notification event"""
-		self.__checkAppBound()
-		cg.Process.send(self, message)
-		notifyEvent = wx.PyEvent()
-		notifyEvent.SetEventType(self.__notifyEventType)
-		wx.PostEvent(self.__app, notifyEvent)
+    def send(self, message):
+        """Send message to the process and then send notification event"""
+        self.__checkAppBound()
+        cg.Process.send(self, message)
+        notifyEvent = wx.PyEvent()
+        notifyEvent.SetEventType(self.__notifyEventType)
+        wx.PostEvent(self.__app, notifyEvent)
 
-	def __checkAppBound(self):
-		"""Bind custom notification event to wx.App"""
-		if self.__app is not None:
-			return
-		# Save a copy of wx.GetApp() locally so that we don't have to refetch it
-		# every time send() is called.
-		self.__app = wx.GetApp()
-		self.__notifyEventType = wx.NewEventType()
-		notifyEventBinder = wx.PyEventBinder(self.__notifyEventType, 0)
-		self.__app.Bind(notifyEventBinder, self.__receive)
+    def __checkAppBound(self):
+        """Bind custom notification event to wx.App"""
+        if self.__app is not None:
+            return
+        # Save a copy of wx.GetApp() locally so that we don't have to refetch it
+        # every time send() is called.
+        self.__app = wx.GetApp()
+        self.__notifyEventType = wx.NewEventType()
+        notifyEventBinder = wx.PyEventBinder(self.__notifyEventType, 0)
+        self.__app.Bind(notifyEventBinder, self.__receive)
 
-	def __receive(self, event):
-		"""Called in response to a notification event"""
-		# Since this method is only be invoked when a new message is present, we can
-		# set a timeout of 0.
-		self.receiver.receive(0)
+    def __receive(self, event):
+        """Called in response to a notification event"""
+        # Since this method is only be invoked when a new message is present, we can
+        # set a timeout of 0.
+        self.receiver.receive(0)
 
 
 def sampleSpawn():
-	"""Start GUI event loop in separate process"""
-	# Unique value used to acknowledge that the wx.App has been created:
-	ack = object()
-	# Unique value used to signal a receive() timeout:
-	timeout = object()
-	# Spawn a new wxProcess, calling mainLoop():
-	proc = cg.spawn(mainLoop, cg.self(), ack, _processClass=wxProcess)
-	# We wait for acknowledgement from the spawned process before proceeding,
-	# since we should make sure that the wx.App has been instantiated before
-	# allowing anyone to send messages to the process.
-	r = cg.Receiver()
-	r.addHandler(ack)
-	# Wait at most 30 seconds.
-	result = r.receive(30000, lambda: timeout)
-	assert result is not timeout
-	return proc
+    """Start GUI event loop in separate process"""
+    # Unique value used to acknowledge that the wx.App has been created:
+    ack = object()
+    # Unique value used to signal a receive() timeout:
+    timeout = object()
+    # Spawn a new wxProcess, calling mainLoop():
+    proc = cg.spawn(mainLoop, cg.self(), ack, _processClass=wxProcess)
+    # We wait for acknowledgement from the spawned process before proceeding,
+    # since we should make sure that the wx.App has been instantiated before
+    # allowing anyone to send messages to the process.
+    r = cg.Receiver()
+    r.addHandler(ack)
+    # Wait at most 30 seconds.
+    result = r.receive(30000, lambda: timeout)
+    assert result is not timeout
+    return proc
 
 
 def mainLoop(proc, ack):
-	"""Create a wx.PySimpleApp and run its MainLoop()"""
-	app = wx.PySimpleApp()
-	proc.send(ack)
-	# We can define our Candygram handler functions here:
-	r = cg.self().receiver
-	# r.addHandler(...)
-	# r.addHandler(...)
-	# ... and so on ...
-	app.MainLoop()
+    """Create a wx.PySimpleApp and run its MainLoop()"""
+    app = wx.PySimpleApp()
+    proc.send(ack)
+    # We can define our Candygram handler functions here:
+    r = cg.self().receiver
+    # r.addHandler(...)
+    # r.addHandler(...)
+    # ... and so on ...
+    app.MainLoop()
