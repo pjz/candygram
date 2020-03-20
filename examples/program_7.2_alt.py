@@ -34,7 +34,7 @@ class Top:
 
     def fun(self, x):
         self.next.send(x)
-        print "Process %s received %s" % (self.n, x)
+        print("Process %s received %s" % (self.n, x))
 
     def top(self):
         link(self.next)
@@ -47,11 +47,11 @@ class Top:
 
 class Top1:
     def stop(self):
-        print "Last process now exiting "
+        print("Last process now exiting ")
         exit("finished")
 
     def fun(self, x):
-        print "Last process received %s" % x
+        print("Last process received %s" % x)
 
     def top(self):
         r = Receiver()

@@ -16,10 +16,10 @@ oldtest:
 	./env/bin/python test/runner.py
 
 test: env
-	./env/bin/py.test test/
+	./env/bin/py.test --timeout=30 test/
 
 test1: env
-	./env/bin/py.test -x -ff --timeout=30 test/
+	./env/bin/py.test -x --ff --timeout=30 test/
 
 clean:
 	rm -rf env build dist *.egg *.egg-info

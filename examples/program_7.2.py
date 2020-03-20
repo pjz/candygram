@@ -26,7 +26,7 @@ def top(next, n):
 
     def fun(x):
         next | x
-        print "Process %s received %s" % (n, x)
+        print("Process %s received %s" % (n, x))
         return top(next, n)
 
     r[Any] = fun, Message
@@ -37,13 +37,13 @@ def top1():
     r = Receiver()
 
     def stop():
-        print "Last process now exiting "
+        print("Last process now exiting ")
         exit("finished")
 
     r["stop"] = stop
 
     def fun(x):
-        print "Last process received %s" % x
+        print("Last process received %s" % x)
         return top1()
 
     r[Any] = fun, Message

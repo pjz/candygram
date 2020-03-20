@@ -121,7 +121,7 @@ def processes():
     _checkSignal()
     getProcessMapLock().acquire()
     try:
-        return getProcessMap().values()
+        return list(getProcessMap().values())
     finally:
         getProcessMapLock().release()
     # end try

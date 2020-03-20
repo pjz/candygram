@@ -37,7 +37,7 @@ def genFilter(pattern):
         result = genSeqFilter(pattern)
     elif isinstance(pattern, dict):
         result = genDictFilter(pattern)
-    elif isinstance(pattern, type) or type(pattern) is types.ClassType:
+    elif isinstance(pattern, type) or type(pattern) is type:
         result = genTypeFilter(pattern)
     elif callable(pattern):
         result = genFuncFilter(pattern)

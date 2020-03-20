@@ -132,7 +132,7 @@ class Process:
     def _removeReceiver(self, receiver):
         """unregister receiver from this process"""
         self._mailboxCondition.acquire()
-        for i in xrange(len(self.__receiverRefs)):
+        for i in range(len(self.__receiverRefs)):
             if self.__receiverRefs[i]() is receiver:
                 del self.__receiverRefs[i]
                 break
@@ -166,7 +166,7 @@ class Process:
             exitError.reason = "killed"
         self.__alive = False
         self.__linksLock.acquire()
-        links = self.__links.values()
+        links = list(self.__links.values())
         self.__linksLock.release()
         for proc in links:
             proc._removeLink(self)
@@ -207,7 +207,7 @@ class Process:
         reason = signal.reason
         # Check if 'reason' is an ExceptionReason
         if isinstance(reason, ExceptionReason):
-            raise reason.excInfo[0], reason.excInfo[1], reason.excInfo[2]
+            raise reason.excInfo[0](reason.excInfo[1]).with_traceback(reason.excInfo[2])
         raise signal
 
     def __run(self, func, args, kwargs):
@@ -219,7 +219,7 @@ class Process:
         exitError = ExitError("normal", self)
         try:
             func(*args, **kwargs)
-        except ExitError, ex:
+        except ExitError as ex:
             exitError = ex
         except:
             exitError = ExitError(ExceptionReason(), self)

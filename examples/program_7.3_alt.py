@@ -27,18 +27,18 @@ class Demo1:
 
     def normalExit(self, msg):
         _, from_, _ = msg
-        print "Demo process received normal exit from %s" % from_
+        print("Demo process received normal exit from %s" % from_)
 
     def otherExit(self, msg):
         _, from_, reason = msg
-        print "Demo process received exit signal %s from %s" % (reason, from_)
+        print("Demo process received exit signal %s from %s" % (reason, from_))
 
     def finished(self):
-        print "Demo finished "
+        print("Demo finished ")
         self.stop = True
 
     def other(self, msg):
-        print "Demo process message %s" % msg
+        print("Demo process message %s" % msg)
 
     def demo1(self):
         r = Receiver()
