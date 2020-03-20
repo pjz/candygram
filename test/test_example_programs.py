@@ -5,13 +5,19 @@ import unittest
 import os
 import time
 import sys
-import StringIO
+import io
 
 import candygram as cg
 import pytest
 
 
-PAUSE = 0.2  # seconds
+# note this *must* not be 0.1s b/c that's used by candygram itself, and will cause sync issues
+PAUSE = 0.15  # seconds
+
+def wait_for(pred):
+    while not pred():
+        time.sleep(PAUSE)
+    time.sleep(PAUSE)
 
 
 class TestExamplePrograms(unittest.TestCase):
@@ -22,7 +28,7 @@ class TestExamplePrograms(unittest.TestCase):
         self.exDir = os.path.join(parent, "examples")
         # Redirect stdout to a StringIO buffer.
         self.oldOut = sys.stdout
-        sys.stdout = StringIO.StringIO()
+        sys.stdout = io.StringIO()
 
     def tearDown(self):
         # Restore stdout
@@ -31,23 +37,27 @@ class TestExamplePrograms(unittest.TestCase):
 
     def resetStdout(self):
         sys.stdout.close()
-        sys.stdout = StringIO.StringIO()
+        sys.stdout = io.StringIO()
 
     def execFile(self, name):
-        dict = {}
-        execfile(os.path.join(self.exDir, name), dict)
-        return dict
+        vdict = {}
+        fullname = os.path.join(self.exDir, name)
+        exec(compile(open(fullname, "rb").read(), fullname, 'exec'), vdict)
+        return vdict
 
     def testProgram_5_1(self):
         def test(dict):
             proc = dict["start"]()
             proc.send("increment")
             proc.send("increment")
-            time.sleep(PAUSE)
+            while proc._mailbox:
+                print("pending messages")
+                time.sleep(PAUSE)
             assert proc.isAlive()
             cg.exit(proc, "kill")
 
         test(self.execFile("program_5.1.py"))
+        time.sleep(PAUSE)
         test(self.execFile("program_5.1_alt.py"))
 
     def testProgram_5_2(self):
@@ -189,37 +199,38 @@ class TestExamplePrograms(unittest.TestCase):
         def test(dict):
             proc = dict["start"]()
             normal = dict["demonstrate_normal"]()
-            time.sleep(PAUSE)
+            wait_for(lambda: not normal.isAlive())
             assert not normal.isAlive()
+            wait_for(sys.stdout.getvalue)
             assert sys.stdout.getvalue() == \
                 "Demo process received normal exit from %s\n" % normal
             self.resetStdout()
             hello = dict["demonstrate_exit"]("hello")
-            time.sleep(PAUSE)
+            wait_for(lambda: not hello.isAlive())
             assert not hello.isAlive()
             assert sys.stdout.getvalue() == \
                 "Demo process received exit signal hello from %s\n" % hello
             self.resetStdout()
             normal = dict["demonstrate_exit"]("normal")
-            time.sleep(PAUSE)
+            wait_for(lambda: not normal.isAlive())
             assert not normal.isAlive()
             assert sys.stdout.getvalue() == \
                 "Demo process received normal exit from %s\n" % normal
             self.resetStdout()
             error = dict["demonstrate_error"]()
-            time.sleep(PAUSE)
+            wait_for(lambda: not error.isAlive())
             assert not error.isAlive()
             assert sys.stdout.getvalue() == \
                 "Demo process received exit signal " \
-                "<exception: integer division or modulo by zero> from %s\n" % error
+                "<exception: division by zero> from %s\n" % error
             self.resetStdout()
             message = dict["demonstrate_message"]("hello")
-            time.sleep(PAUSE)
+            wait_for(lambda: not message.isAlive())
             assert not message.isAlive()
             assert sys.stdout.getvalue() == "Demo process message hello\n"
             self.resetStdout()
             finished = dict["demonstrate_message"]("finished_demo")
-            time.sleep(PAUSE)
+            wait_for(lambda: not finished.isAlive())
             assert not finished.isAlive()
             assert sys.stdout.getvalue() == "Demo finished \n"
             assert not proc.isAlive()

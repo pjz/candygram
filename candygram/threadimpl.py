@@ -23,7 +23,7 @@
 __revision__ = "$Id: threadimpl.py,v 1.1 2004/08/19 23:14:50 hobb0001 Exp $"
 
 
-import thread
+import _thread
 
 
 # If we ever use a different implementation (like, say, stackless) use an
@@ -32,6 +32,6 @@ import thread
 # I strongly disagree :-) We should instead use a parameter passed to a
 # (e.g., in a constructor or function) that takes a sensible defualt but offers
 # the library user with the option of providing other supported "backends."
-getCurrentThread = thread.get_ident
-startThread = thread.start_new_thread
-allocateLock = thread.allocate_lock
+getCurrentThread = _thread.get_ident
+startThread = _thread.start_new_thread
+allocateLock = _thread.allocate_lock

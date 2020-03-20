@@ -2,14 +2,14 @@
 
 
 import unittest
-import StringIO
+import io
 
 from candygram import *
 
 
 class TestDocExample(unittest.TestCase):
     def setUp(self):
-        self.out = StringIO.StringIO()
+        self.out = io.StringIO()
 
     def tearDown(self):
         self.out.close()
@@ -22,13 +22,15 @@ class TestDocExample(unittest.TestCase):
             r["land shark"] = lambda m: "Go Away " + m, Message
             r["candygram"] = lambda m: "Hello " + m, Message
             for message in r:
-                print >>self.out, message
+                print(message, file=self.out)
 
         proc = spawn(proc_func)
         proc | "land shark"
         proc | "candygram"
         # Give the proc a chance to print its messages before termination:
-        time.sleep(1)
+        #import rpdb; rpdb.set_trace()
+        while proc._mailbox:
+            time.sleep(.1)
         exit(proc, "kill")
         # Assert print statements worked as advertised
         assert self.out.getvalue() == "Go Away land shark\n" "Hello candygram\n"
@@ -42,7 +44,7 @@ class TestDocExample(unittest.TestCase):
             r.addHandler("land shark", shut_door, cg.Message)
             r.addHandler("candygram", open_door, cg.Message)
             for message in r:
-                print >>self.out, message
+                print(message, file=self.out)
 
         def shut_door(name):
             return "Go Away " + name
@@ -73,12 +75,12 @@ class TestDocExample(unittest.TestCase):
         def print_string(name, message):
             msg, process, string = message
             # 'msg' and 'process' are unused
-            print >>self.out, "%s received: %s" % (name, string)
+            print("%s received: %s" % (name, string), file=self.out)
 
         def print_any(name, message):
             msg, process, prefix, value = message
             # 'msg' and 'process' are unused
-            print >>self.out, "%s received: %s %s" % (name, prefix, value)
+            print("%s received: %s %s" % (name, prefix, value), file=self.out)
 
         a = spawn(proc_func, "A")
         b = spawn(proc_func, "B")

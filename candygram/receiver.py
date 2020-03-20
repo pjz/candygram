@@ -111,7 +111,7 @@ class Receiver:
         """remove handler from receiver"""
         self.__lock.acquire()
         try:
-            for i in xrange(len(self.__handlers)):
+            for i in range(len(self.__handlers)):
                 if self.__handlers[i][0] == handlerReference:
                     del self.__handlers[i]
                     return
@@ -155,7 +155,8 @@ class Receiver:
         return handler(*args, **kwargs)
 
     __call__ = receive
-    next = receive
+    #next = receive
+    __next__ = receive
 
     def __iter__(self):
         return self
@@ -199,7 +200,7 @@ class Receiver:
         # Prevent anyone from adding a new handler while we're scanning the mailbox:
         self.__lock.acquire()
         try:
-            for i in xrange(self.__lastMessage, len(self.__mailbox)):
+            for i in range(self.__lastMessage, len(self.__mailbox)):
                 message = self.__mailbox[i]
                 for id_, filter_, handler, args, kwargs in self.__handlers:
                     if filter_(message):
