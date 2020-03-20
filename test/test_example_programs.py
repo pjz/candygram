@@ -10,7 +10,7 @@ import StringIO
 import candygram as cg
 
 
-PAUSE = 0.1  # seconds
+PAUSE = 0.2  # seconds
 
 
 class TestExamplePrograms(unittest.TestCase):

@@ -4,6 +4,7 @@
 import unittest
 import time
 
+import pytest
 import candygram as cg
 
 
@@ -20,9 +21,10 @@ class TestExitException:
 		time.sleep(0.1)
 
 	def testDoubleException(self):
-		proc = cg.spawnLink(self.exception)
-		time.sleep(0.1)
-		raise Exception('second exception')
+		with pytest.raises(Exception, match="test exception"):
+			proc = cg.spawnLink(self.exception)
+			time.sleep(0.1)
+			raise Exception('second exception')
 
 
 if __name__ == '__main__':
