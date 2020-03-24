@@ -1,0 +1,644 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<link rel="STYLESHEET" href="candygram.css" type='text/css'>
+<link rel="first" href="candygram.html" title='Candygram'>
+<link rel='contents' href='contents.html' title="Contents">
+<link rel='index' href='genindex.html' title='Index'>
+<link rel='last' href='about.html' title='About this document...'>
+<link rel='help' href='about.html' title='About this document...'>
+<LINK REL="next" HREF="node6.html">
+<LINK REL="prev" href="patterns.html">
+<LINK REL="parent" HREF="candygram.html">
+<LINK REL="next" HREF="node6.html">
+<meta name='aesop' content='information'>
+<META NAME="description" CONTENT="The candygram module">
+<META NAME="keywords" CONTENT="candygram">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<title>4 The candygram module</title>
+</head>
+<body>
+<DIV CLASS="navigation">
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td><a rel="prev" title="3 Receiver Patterns" 
+  href="patterns.html"><img src='previous.gif'
+  border='0' height='32'  alt='Previous Page' width='32'></A></td>
+<td><a rel="parent" title="Candygram" 
+  HREF="candygram.html"><img src='up.gif'
+  border='0' height='32'  alt='Up One Level' width='32'></A></td>
+<td><a rel="next" title="5 Examples" 
+  HREF="node6.html"><img src='next.gif'
+  border='0' height='32'  alt='Next Page' width='32'></A></td>
+<td align="center" width="100%">Candygram</td>
+<td><a rel="contents" title="Table of Contents" 
+  href="contents.html"><img src='contents.gif'
+  border='0' height='32'  alt='Contents' width='32'></A></td>
+<td><img src='blank.gif'
+  border='0' height='32'  alt='' width='32'></td>
+<td><a rel="index" title="Index" 
+  href="genindex.html"><img src='index.gif'
+  border='0' height='32'  alt='Index' width='32'></A></td>
+</tr></table>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="patterns.html">3 Receiver Patterns</A>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" HREF="candygram.html">Candygram</A>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" HREF="node6.html">5 Examples</A>
+<br><hr>
+</DIV>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></a>
+
+<UL CLASS="ChildLinks">
+<LI><A href="module-candygram.html#SECTION000510000000000000000">4.1 Functions</a>
+<LI><A href="module-candygram.html#SECTION000520000000000000000">4.2 Process Objects</a>
+<LI><A href="module-candygram.html#SECTION000530000000000000000">4.3 Receiver Objects</a>
+<LI><A href="module-candygram.html#SECTION000540000000000000000">4.4 Constants</a>
+<LI><A href="module-candygram.html#SECTION000550000000000000000">4.5 Exceptions</a>
+</ul>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION000500000000000000000">
+4 The <tt class="module">candygram</tt> module</A>
+</H1>
+
+<P>
+
+
+<P>
+The <tt class="module">candygram</tt> module exports the following functions, classes,
+constants, and exceptions. Since the name <tt class="module">candygram</tt> is a bit long, you
+would typically import the module in one of the following ways:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; from candygram import *
+</pre></div>
+or
+<div class="verbatim"><pre>
+&gt;&gt;&gt; import candygram as cg
+</pre></div>
+
+<P>
+
+<H2><A NAME="SECTION000510000000000000000">
+4.1 Functions</A>
+</H2>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-3"><tt class="function">spawn</tt></a></b>(</nobr></td>
+  <td><var>func</var><big>[</big><var>, args...</var><big>]</big><big>[</big><var>, _processClass=Process</var><big>]</big>)</td></tr></table>
+<dd>
+Create a new concurrent process by calling the function <var>func</var> with the
+<var>args</var> argument list and return the resulting <tt class="class">Process</tt> instance.
+When the function <var>func</var> returns, the process terminates. Raises a
+<code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>func</var> is not
+<tt class="function">callable()</tt>.
+
+<P>
+If you define a subclass of <tt class="class">Process</tt>, you can instruct the
+<tt class="function">spawn()</tt> function to create an instance of that class by passing
+the class with the optional <var>_processClass</var> keyword argument.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-4"><tt class="function">link</tt></a></b>(</nobr></td>
+  <td><var>proc</var>)</td></tr></table>
+<dd>
+Create a link to the process <var>proc</var>, if there is not such a link already. If
+a process attempts to create a link to itself, nothing is done. Raises a
+<code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>proc</var> is not a <tt class="class">Process</tt>
+instance. Sends a <code>'noproc'</code> <code>'EXIT'</code> signal to calling process if the
+<var>proc</var> process is no longer alive.
+
+<P>
+When a process terminates, it sends an <code>'EXIT'</code> signal is to all of its
+linked processes. If a process terminates normally, it sends a <code>'normal'</code>
+<code>'EXIT'</code> signal to its linked processes.
+
+<P>
+All links are bidirectional. That is, if process A calls <code>link(B)</code>, then if
+process B terminates, it sends an <code>'EXIT'</code> signal to process A. Conversely,
+if process A terminates, it likewise sends an <code>'EXIT'</code> signal to process B.
+
+<P>
+Refer to the <tt class="function">processFlag()</tt> function for details about handling
+signals.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-5"><tt class="function">spawnLink</tt></a></b>(</nobr></td>
+  <td><var>func</var><big>[</big><var>, args...</var><big>]</big><big>[</big><var>, _processClass=Process</var><big>]</big>)</td></tr></table>
+<dd>
+This function is identical to the following code being evaluated in an atomic
+operation:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; proc = spawn(func, args...)
+&gt;&gt;&gt; link(proc)
+</pre></div>
+This function is necessary since the process created might run immediately and
+fail before <tt class="function">link()</tt> is called. Returns the <tt class="class">Process</tt> instance of
+the newly created process. Raises a <code>'badarg'</code> <tt class="exception">ExitError</tt> if
+<var>func</var> is not <tt class="function">callable()</tt>.
+
+<P>
+If you define a subclass of <tt class="class">Process</tt>, you can instruct the
+<tt class="function">spawnLink()</tt> function to create an instance of that class by passing
+the class with the optional <var>_processClass</var> keyword argument.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-6"><tt class="function">unlink</tt></a></b>(</nobr></td>
+  <td><var>proc</var>)</td></tr></table>
+<dd>
+Remove the link, if there is one, from the calling process to another process
+given by the <var>proc</var> argument. The function does not fail if the calling
+process is not linked to <var>proc</var>, or if <var>proc</var> is not alive. Raises a
+<code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>proc</var> is not a <tt class="class">Process</tt>
+instance.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-7"><tt class="function">isProcessAlive</tt></a></b>(</nobr></td>
+  <td><var>proc</var>)</td></tr></table>
+<dd>
+Return <tt class="constant">True</tt> if the process is alive, i.e., has not terminated.
+Otherwise, return <tt class="constant">False</tt>. Raises a <code>'badarg'</code>
+<tt class="exception">ExitError</tt> if <var>proc</var> is not a <tt class="class">Process</tt> instance.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-8"><tt class="function">self</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Return the <tt class="class">Process</tt> instance of the calling process.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-9"><tt class="function">self_</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+An alias for the <tt class="function">self()</tt> function. You can use this function in class
+methods where <var>self</var> is already defined.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-10"><tt class="function">processes</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Return a list of all active processes.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-11"><tt class="function">send</tt></a></b>(</nobr></td>
+  <td><var>proc, message</var>)</td></tr></table>
+<dd>
+Send the <var>message</var> to the <var>proc</var> process and return <var>message</var>. This
+is the same as <var>proc</var><code>.send(</code><var>message</var><code>)</code>. Raises a
+<code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>proc</var> is not a <tt class="class">Process</tt>
+instance.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-12"><tt class="function">exit</tt></a></b>(</nobr></td>
+  <td><big>[</big><var>proc, </var><big>]</big><var>reason</var>)</td></tr></table>
+<dd>
+When the <var>proc</var> argument is not given, this function raises an
+<tt class="exception">ExitError</tt> with the reason <var>reason</var>. <var>reason</var> can be any
+value.
+
+<P>
+When the <var>proc</var> argument is given, this function sends an <code>'EXIT'</code>
+signal to the process <var>proc</var>. This is not necessarily the same as sending an
+<code>'EXIT'</code> message to <var>proc</var>. They are the same if <var>proc</var> is trapping
+exits. If <var>proc</var> is not trapping exits, however, the <var>proc</var> process
+terminates and propagates the <code>'EXIT'</code> signal in turn to its linked
+processes.
+
+<P>
+If the <var>reason</var> is the string <code>'kill'</code>, an untrappable <code>'EXIT'</code>
+signal is sent to the process. In other words, the <var>proc</var> process is
+unconditionally killed.
+
+<P>
+Refer to the <tt class="function">processFlag()</tt> function for details about trapping exits.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-13"><tt class="function">processFlag</tt></a></b>(</nobr></td>
+  <td><var>flag, option</var>)</td></tr></table>
+<dd>
+Set the given <var>flag</var> for the calling process. Returns the old value of the
+flag. Raises a <code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>flag</var> is not a
+recognized flag value, or if <var>option</var> is not a recognized value for
+<var>flag</var>.
+
+<P>
+Currently, <code>'trap_exit'</code> is the only recognized flag value. When
+<code>'trap_exit'</code> is set to <tt class="constant">True</tt>, <code>'EXIT'</code> signals arriving to
+a process are converted to <code>('EXIT', from, reason)</code> messages, which can be
+received as ordinary messages. If <code>'trap_exit'</code> is set to <tt class="constant">False</tt>,
+the process exits if it receives an <code>'EXIT'</code> signal other than
+<code>'normal'</code> and propagates the <code>'EXIT'</code> signal to its linked processes.
+Application processes should normally not trap exits.
+</dl>
+
+<P>
+
+<H2><A NAME="SECTION000520000000000000000">
+4.2 Process Objects</A>
+</H2>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<a name="l2h-14"><tt class="class">Process</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Represents a concurrent process. A <tt class="class">Process</tt> is never created via its
+constructor. The <tt class="function">spawn()</tt> and <tt class="function">spawnLink()</tt> functions create
+all processes.
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-15"><tt class="method">isProcessAlive</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Return <tt class="constant">True</tt> if the process is alive, i.e., has not terminated.
+Otherwise, return <tt class="constant">False</tt>.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-16"><tt class="method">isAlive</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+An alias for the <tt class="method">isProcessAlive()</tt> method. (The word ``process'' is
+redundant in a method name when the method is a member of the <tt class="class">Process</tt>
+class.)
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-17"><tt class="method">send</tt></a></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table>
+<dd>
+Send the <var>message</var> to this process and return <var>message</var>. A routine
+running in a separate process calls this method to place the given
+<var>message</var> into this process's mailbox. A <tt class="class">Receiver</tt> that is operating
+in this process may then pick up the message.
+
+<P>
+Sending a message is an asynchronous operation so the <tt class="method">send()</tt> call does
+not wait for a <tt class="class">Receiver</tt> to retrieve the message. Even if this process
+has already terminated, the system does not notify the sender. Messages are
+always delivered, and always in the same order they were sent.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-18"><tt class="method">__or__</tt></a></b>(</nobr></td>
+  <td><var>message</var>)</td></tr></table>
+<dd>
+<a name="l2h-19">&nbsp;</a>
+An alias for the <tt class="method">send()</tt> method. The OR operator, `|', is an alias
+to the <tt class="method">send()</tt> method so that developers can use a more Erlangy syntax
+to send messages. In Erlang, the `!' primitive sends messages. For example:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; proc | ('knock-knock', 'candygram')
+</pre></div>
+</dl>
+
+<P>
+</dl>
+
+<P>
+
+<H2><A NAME="SECTION000530000000000000000">&nbsp;</A>
+<BR>
+4.3 Receiver Objects
+</H2>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><span class="typelabel">class</span>&nbsp;<a name="l2h-20"><tt class="class">Receiver</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Retrieves messages from a process's mailbox. Every process maintains a mailbox,
+which contains messages that have been sent to it via the <tt class="method">send()</tt>
+method. To retrieve the messages out of the mailbox, a process must use a
+<tt class="class">Receiver</tt> object. Like the <tt class="keyword">receive</tt> statement in Erlang, a
+<tt class="class">Receiver</tt> object compares an incoming message against multiple patterns
+and invokes the callback function that is associated with the first matching
+pattern. Refer to section <A href="patterns.html#patterns">3</A> for details about how to specify
+message patterns.
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-21"><tt class="method">addHandler</tt></a></b>(</nobr></td>
+  <td><var>pattern</var><big>[</big><var>, func</var><big>[</big><var>, args...</var><big>]</big><big>]</big>)</td></tr></table>
+<dd>
+Register a handler function <var>func</var> for the <var>pattern</var>. The
+<tt class="method">receive()</tt> method calls the <var>func</var> with the <var>args</var> argument
+list when it receives a message that matches <var>pattern</var>. When a handler
+function <var>func</var> is not specified, the <tt class="method">receive()</tt> method removes any
+matching message from the mailbox and does nothing more with it. Refer to
+section <A href="patterns.html#patterns">3</A> for details about how to specify message patterns.
+Returns a handler reference that can be used with the <tt class="method">removeHandler()</tt>
+method. Raises a <code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>func</var> is not
+<tt class="function">callable()</tt>.
+
+<P>
+If any of the <var>args</var> arguments is <tt class="constant">candygram.Message</tt>, then the
+<tt class="method">receive()</tt> method replaces that argument with the matching message when
+it invokes <var>func</var>.
+
+<P>
+Refer to the <tt class="method">receive()</tt> documentation for details about the
+mechanism by which it invokes the handlers.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-22"><tt class="method">__setitem__</tt></a></b>(</nobr></td>
+  <td><var>pattern, funcWithArgs</var>)</td></tr></table>
+<dd>
+<a name="l2h-23">&nbsp;</a>
+An alias for the <tt class="method">addHandler()</tt> method. If <var>funcWithArgs</var> is a tuple,
+then this method sends the first element in the tuple as the <var>func</var>
+parameter to <tt class="method">addHandler()</tt> and the remaining as the <var>args</var>. If
+<var>funcWithArgs</var> is not a tuple, then this method assumes it to be a handler
+function and sends it as the <var>func</var> parameter to <tt class="method">addHandler()</tt>.
+
+<P>
+<tt class="method">__setitem__()</tt> is an alias to the <tt class="method">addHandler()</tt> method so that
+developers can use a more Erlangy syntax to specify handlers. In Erlang, the
+``<var>pattern</var> -&gt; <var>func</var>'' syntax specifies pattern guards. For
+example:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; r = Receiver()
+&gt;&gt;&gt; r['knock-knock', 'candygram'] = answer, 'From whom?'
+</pre></div>
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-24"><tt class="method">__getitem__</tt></a></b>(</nobr></td>
+  <td><var>pattern</var>)</td></tr></table>
+<dd>
+<a name="l2h-25">&nbsp;</a>
+An alias for the <tt class="method">addHandler()</tt> method. This method calls
+<tt class="method">addHandler()</tt> without a <var>func</var> parameter.
+
+<P>
+<tt class="method">__getitem__()</tt> is an alias to the <tt class="method">addHandler()</tt> method so that
+developers can use a more Erlangy syntax to specify handlers. In Erlang, the
+``<var>pattern</var> -&gt; <var>func</var>'' syntax specifies pattern guards. For
+example:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; r = Receiver()
+&gt;&gt;&gt; r['knock-knock', 'shark']  # ignore sharks
+</pre></div>
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-26"><tt class="method">addHandlers</tt></a></b>(</nobr></td>
+  <td><var>receiver</var>)</td></tr></table>
+<dd>
+Register all handler functions in <var>receiver</var> with this <tt class="class">Receiver</tt>
+object. This method adds all of the patterns and handler functions that have
+been added to the given <var>receiver</var> to this receiver, in the same order. You
+can use this method to make copies of <tt class="class">Receiver</tt> objects. Returns a list
+of handler references that can be used with the <tt class="method">removeHandler()</tt> method.
+Raises a <code>'badarg'</code> <tt class="exception">ExitError</tt> if <var>receiver</var> is not a
+<tt class="class">Receiver</tt> instance.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-27"><tt class="method">removeHandler</tt></a></b>(</nobr></td>
+  <td><var>handlerReference</var>)</td></tr></table>
+<dd>
+Remove a handler function. The <var>handlerReference</var> must be a value returned
+by either the <tt class="method">addHandler()</tt> or the <tt class="method">addHandlers()</tt> method. Since
+all handler references are unique, this method removes exactly one handler
+function from the <tt class="class">Receiver</tt>. Raises a <code>'badarg'</code>
+<tt class="exception">ExitError</tt> if <var>handlerReference</var> is not a proper reference, or if
+it refers to a handler function that is not in the <tt class="class">Receiver</tt>.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-28"><tt class="method">after</tt></a></b>(</nobr></td>
+  <td><var>timeout</var><big>[</big><var>, func</var><big>[</big><var>, args...</var><big>]</big><big>]</big>)</td></tr></table>
+<dd>
+Register a timeout handler function <var>func</var>. The <tt class="method">receive()</tt> method
+calls the <var>func</var> with the <var>args</var> argument list when it does not receive
+a matching message within <var>timeout</var> milliseconds. Raises a <code>'badarg'</code>
+<tt class="exception">ExitError</tt> if <var>func</var> is not <tt class="function">callable()</tt> or if
+<var>timeout</var> is not an integer. Raises an <tt class="exception">AssertionError</tt> if the
+<tt class="method">after()</tt> method has already been invoked.
+
+<P>
+If the <tt class="method">receive()</tt> method does not find a matching message within
+<var>timeout</var> milliseconds, it invokes <var>func</var> with <var>args</var> and returns
+the result. When a handler function <var>func</var> is not specified, the
+<tt class="method">receive()</tt> method returns <tt class="constant">None</tt> if it times out.
+
+<P>
+None of the <var>args</var> arguments should be <tt class="constant">candygram.Message</tt>, since
+there is no message to pass when a timeout occurs.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-29"><tt class="method">receive</tt></a></b>(</nobr></td>
+  <td><big>[</big><var>timeout</var><big>[</big><var>, func</var><big>[</big><var>, args...</var><big>]</big><big>]</big><big>]</big>)</td></tr></table>
+<dd>
+Find a matching message in the process's mailbox, invoke the related handler
+function, and return the result. The <tt class="class">Receiver</tt> object compares the first
+message in the process's mailbox with each of its registered patterns, in the
+order that the patterns were added via the <tt class="method">addHandler()</tt> method. If any
+pattern matches the message, this method removes the message from the mailbox,
+calls the associated handler function, and returns its result. If the matching
+pattern does not have a handler function associated with it, this method returns
+<tt class="constant">None</tt>. If no pattern matches the message, this method leaves the
+message in the mailbox, skips to the next message in the mailbox, and compares
+it with each of the patterns. It continues on through each of the messages in
+the mailbox until a match is found.
+
+<P>
+If no message matches any of the patterns, or if the mailbox is empty, this
+method blocks until the process receives a message that does match one of the
+patterns, or until the given <var>timeout</var> has elapsed. If no <var>timeout</var> is
+specified, this method blocks indefinitely. If a <var>timeout</var> is specified, it
+is equivalent to calling <tt class="method">after(<var>timeout</var>, <var>func</var>, <var>args</var>)</tt>
+just prior to <tt class="method">receive()</tt>. Raises a <code>'badarg'</code>
+<tt class="exception">ExitError</tt> if <var>func</var> is not <tt class="function">callable()</tt> or if
+<var>timeout</var> is not an integer. Also raises an <tt class="exception">AssertionError</tt> if a
+<var>timeout</var> is specified and the <tt class="method">after()</tt> method has already been
+invoked.
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-30"><tt class="method">__call__</tt></a></b>(</nobr></td>
+  <td><big>[</big><var>timeout</var><big>[</big><var>, func</var><big>[</big><var>, args...</var><big>]</big><big>]</big><big>]</big>)</td></tr></table>
+<dd>
+<a name="l2h-31">&nbsp;</a>
+An alias for the <tt class="method">receive()</tt> method. <tt class="method">__call__()</tt> is an alias to
+the <tt class="method">receive()</tt> method so that developers can use a shortened, more
+Erlangy syntax with <tt class="class">Receiver</tt>s. For example:
+<div class="verbatim"><pre>
+&gt;&gt;&gt; def convert():
+...     r = Receiver()
+...     r['one'] = lambda: 1
+...     r['two'] = lambda: 2
+...     r['three'] = lambda: 3
+...     return r()
+</pre></div>
+</dl>
+
+<P>
+<dl><dt><table cellpadding="0" cellspacing="0"><tr valign="baseline">
+  <td><nobr><b><a name="l2h-32"><tt class="method">__iter__</tt></a></b>(</nobr></td>
+  <td>)</td></tr></table>
+<dd>
+Return an iterator that repeatedly invokes <tt class="method">receive()</tt>. Candygram code
+often uses the following idiom:
+<div class="verbatim"><pre>
+... while True:
+...     result = receiver.receive()
+...     # do whatever with the result...
+</pre></div>
+With an iterator, you can spell the code above like this instead:
+<div class="verbatim"><pre>
+... for result in receiver:
+...     # do whatever with the result...
+</pre></div>
+</dl>
+
+<P>
+</dl>
+
+<P>
+
+<H2><A NAME="SECTION000540000000000000000">
+4.4 Constants</A>
+</H2>
+
+<P>
+<dl><dt><b><a name="l2h-33"><tt>Any</tt></a></b>
+<dd>
+When used in a pattern, the <tt class="constant">Any</tt> constant will match any value.
+</dl>
+
+<P>
+<dl><dt><b><a name="l2h-34"><tt>Message</tt></a></b>
+<dd>
+When used as a function argument in <tt class="method">Receiver.addHandler()</tt>, the
+<tt class="method">Receiver.receive()</tt> method replaces the argument with the matching
+message when it invokes the handler function.
+</dl>
+
+<P>
+
+<H2><A NAME="SECTION000550000000000000000">
+4.5 Exceptions</A>
+</H2>
+
+<P>
+<dl><dt><b><span class="typelabel">exception</span>&nbsp;<a name="l2h-35"><tt class="exception">ExitError</tt></a></b>
+<dd>
+Represents <code>'EXIT'</code> errors from Erlang. If an Erlang function can
+cause a failure under certain circumstances, then the corresponding Candygram
+function raises an <tt class="exception">ExitError</tt> under the same circumstances.
+
+<P>
+A process also raises an <tt class="exception">ExitError</tt> in all of its linked processes
+if it terminates for a reason other than <code>'normal'</code>.
+
+<P>
+<div class="note"><b class="label">Note:</b>
+
+When a process terminates with a reason other than <code>'normal'</code>, it does not
+immediately raise an <tt class="exception">ExitError</tt> in all linked processes. Candygram
+defers the <tt class="exception">ExitError</tt> instead, and raises it the next time one of its
+functions or methods is called. (Python does not allow you to unconditionally
+interrupt a separate thread.)
+</div>
+
+<P>
+<dl><dt><b><a name="l2h-36"><tt class="member">reason</tt></a></b>
+<dd>
+Specifies the reason why the <tt class="exception">ExitError</tt> was raised. Can be any value.
+</dl>
+
+<P>
+<dl><dt><b><a name="l2h-37"><tt class="member">proc</tt></a></b>
+<dd>
+The process that originally caused the <tt class="exception">ExitError</tt>.
+</dl>
+
+<P>
+</dl>
+
+<P>
+
+<DIV CLASS="navigation">
+<p><hr>
+<table align="center" width="100%" cellpadding="0" cellspacing="2">
+<tr>
+<td><a rel="prev" title="3 Receiver Patterns" 
+  rel="prev" title="3 Receiver Patterns" 
+  href="patterns.html"><img src='previous.gif'
+  border='0' height='32'  alt='Previous Page' width='32'></A></td>
+<td><a rel="parent" title="Candygram" 
+  rel="parent" title="Candygram" 
+  HREF="candygram.html"><img src='up.gif'
+  border='0' height='32'  alt='Up One Level' width='32'></A></td>
+<td><a rel="next" title="5 Examples" 
+  rel="next" title="5 Examples" 
+  HREF="node6.html"><img src='next.gif'
+  border='0' height='32'  alt='Next Page' width='32'></A></td>
+<td align="center" width="100%">Candygram</td>
+<td><a rel="contents" title="Table of Contents" 
+  rel="contents" title="Table of Contents" 
+  href="contents.html"><img src='contents.gif'
+  border='0' height='32'  alt='Contents' width='32'></A></td>
+<td><img src='blank.gif'
+  border='0' height='32'  alt='' width='32'></td>
+<td><a rel="index" title="Index" 
+  rel="index" title="Index" 
+  href="genindex.html"><img src='index.gif'
+  border='0' height='32'  alt='Index' width='32'></A></td>
+</tr></table>
+<b class="navlabel">Previous:</b>
+<a class="sectref" rel="prev" href="patterns.html">3 Receiver Patterns</A>
+<b class="navlabel">Up:</b>
+<a class="sectref" rel="parent" HREF="candygram.html">Candygram</A>
+<b class="navlabel">Next:</b>
+<a class="sectref" rel="next" HREF="node6.html">5 Examples</A>
+<hr>
+<span class="release-info">Release 1.0, documentation updated on October 21, 2004.</span>
+</DIV>
+<!--End of Navigation Panel-->
+<ADDRESS>
+<a href="http://sourceforge.net"><img src="http://sourceforge.net/sflogo.php?group_id=114295&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</ADDRESS>
+</BODY>
+</HTML>
